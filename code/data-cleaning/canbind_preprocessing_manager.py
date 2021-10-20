@@ -257,7 +257,7 @@ if __name__ == "__main__":
     
     elif len(sys.argv) == 1:
         # pathData = r'C:\Users\jjnun\Documents\Sync\Research\1_CANBIND_Replication\teyden-git\data\canbind_data\\'
-        pathData = r'C:\Users\Tejas\Documents\star_project\antidep_pred_replication\data\canbind_raw_data'
+        pathData = r'C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\data\canbind_raw_data'
         aggregate_and_clean(pathData, verbose=False)
         ygen(pathData)
         impute(pathData)
