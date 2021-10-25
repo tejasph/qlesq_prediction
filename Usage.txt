@@ -1,6 +1,6 @@
 Processing the STARD data:
 
-C:\Users\Tejas\Documents\star_project>python antidep_pred_replication/code/data-cleaning/stard_preprocessing_manager.py STARD_Raw_Data_Used -a
+C:\Users\Tejas\Documents\star_project>python code/data-cleaning/stard_preprocessing_manager.py data/STARD_raw -a
 
 note: processed datasets are generated within the STARD_Raw_Data_Used folder (suggest moving the processed data into antidep_pred_replication/data repo or change path)
 
@@ -11,7 +11,7 @@ C:\Users\Tejas\Documents\star_project\antidep_pred_replication>python -v code/da
 note: before running this, go into canbind_preprocessing_manager.py and alter pathData to a correct pathing for the raw data (see below)
 
     elif len(sys.argv) == 1:
-        pathData = r'C:\Users\Tejas\Documents\star_project\antidep_pred_replication\data\canbind_raw_data'
+        pathData = r'C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\data\canbind_raw_data'
         aggregate_and_clean(pathData, verbose=False)
         ygen(pathData)
         impute(pathData)
