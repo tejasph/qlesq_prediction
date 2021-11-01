@@ -1120,7 +1120,7 @@ def generate_qlesq_y(root_data_dir_path, days_baseline_cutoff = 77):
 
     # Only consider rows that fall below the days baseline cutoff (default is 8 weeks or 77 days)
     selector.filter_time_window(max_cutoff = days_baseline_cutoff)
-    
+
     # Drop Na values for total qlesq
     selector.filter_NA()
 
@@ -1136,10 +1136,6 @@ def generate_qlesq_y(root_data_dir_path, days_baseline_cutoff = 77):
     # Drop any rows where level is = Follow up but Calltype isn't Entry or Base
     selector.filter_inappropriate_calltype("Follow up", ['Entry', 'Base'])
 
-
-
-
-    # Drop Na values for level (to do)
 
 
 
@@ -1168,12 +1164,24 @@ def generate_qlesq_y(root_data_dir_path, days_baseline_cutoff = 77):
         end_score = sorted_data.iloc[-1]['totqlesq']
         end_day = sorted_data.iloc[-1]['days_baseline']
         end_lvl = sorted_data.iloc[-1]['level']
+        end_type = sorted_data.iloc[-1]['CallType']
         
         if start_day >= 21:  #8-21
             continue
         
         if end_day <= 21 or end_day >=77:
             continue
+
+        assert data['totqlesq'].isna().sum() == 0, f"Total Qlesq has {data['totqlesq'].isna().sum()} NA values for {subject}"
+        assert data.duplicated().sum() == 0, f"Duplicate rows detected for {subject}"
+        assert data.shape[0] >= 2, f"Subject profile has 1 row or less, for {subject}"
+        assert end_day <= 77, f"End day found to be later than Week 8 (77 days), for {subject}"
+        assert end_day >= 21, f"End day found to be earlier than Week 4 (21 days), for {subject}"
+        assert start_day <= 21, f"Start day found to be later than Week 4 (21 days), for {subject}"
+        assert end_lvl != "Level 3" and end_lvl != "Level 4", f"Invalid levels for {subject}"
+        if end_lvl == "Level 2" or end_lvl == "Follow up":
+            assert end_type == "Entry" or end_type == "Base", f"Incorrect Call type () for a level 2 or follow-up score, for {subject}"
+        assert pd.isna(end_lvl) == False, f"End level is NA for {subject}"
         
         
         relevant_ids.append(id)

@@ -21,7 +21,7 @@ class subject_selector():
         self.df = self.df[(self.df['days_baseline']>= min_cutoff) & (self.df['days_baseline'] <= max_cutoff)]
         print(self.df.shape)
         
-    def filter_NA(self, subset_col = ['totqlesq']):
+    def filter_NA(self, subset_col = ['totqlesq', 'level']):
         self.df = self.df.dropna(subset = subset_col)
         print(self.df.shape)
     
