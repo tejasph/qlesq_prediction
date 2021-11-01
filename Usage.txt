@@ -20,5 +20,5 @@ note: before running this, go into canbind_preprocessing_manager.py and alter pa
 
 Create Overlapping Data from processed data:
 
-C:\Users\Tejas\Documents\star_project\antidep_pred_replication>python code/data-cleaning/generate_overlapping_features.py -sd data/processed
+C:\Users\Tejas\Documents\star_project\antidep_pred_replication>python code/data-cleaning/generate_overlapping_features.py -sd data/STARD_raw/processed_data/final_xy_data_matrices
 
