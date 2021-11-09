@@ -8,7 +8,7 @@ import sys
 from canbind_globals import COL_NAME_PATIENT_ID,COL_NAME_EVENTNAME, EVENTNAME_WHITELIST, ORIGINAL_SCALE_FILENAMES, COL_NAMES_WHITELIST_PSYHIS, COL_NAMES_BLACKLIST_DARS, COL_NAMES_BLACKLIST_SHAPS, COL_NAMES_BLACKLIST_PSYHIS
 from canbind_globals import COL_NAME_GROUP, GROUP_WHITELIST, VALUE_REPLACEMENT_MAPS, QLESQ_COL_MAPPING, COL_NAMES_ONE_HOT_ENCODE, COL_NAMES_BLACKLIST_UNIQS, COLLISION_MANAGER
 from canbind_imputer import impute
-from canbind_ygen import ygen
+from canbind_ygen import ygen, qlesq_y_gen
 from canbind_utils import aggregate_rows, finalize_blacklist, one_hot_encode, merge_columns, add_columns_to_blacklist
 from canbind_utils import is_number, replace_target_col_values_to_be_refactored, collect_columns_to_extend, extend_columns_eventbased
 from utils import get_valid_subjects
@@ -260,6 +260,7 @@ if __name__ == "__main__":
         pathData = r'C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\data\canbind_raw_data'
         aggregate_and_clean(pathData, verbose=False)
         ygen(pathData)
+        qlesq_y_gen("data/canbind_raw_data/q-les-q/")
         impute(pathData)
         convert_canbind_to_overlapping(pathData)
     else:

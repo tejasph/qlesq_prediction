@@ -207,6 +207,106 @@ def ygen(root_dir, debug=False):
     # Save the version containing NaN values just for debugging, not otherwise used
     if debug: merged_df.to_csv(root_dir + "/canbind-clean-aggregated-data.with-id.contains-blanks-ygen.csv")
 
+class qlesq_subject_selector():
+
+    def __init__(self, df):
+        self.df = df.copy()
+        
+    def get_random_subject(self):
+        
+        random_id = list(self.df.SUBJLABEL.sample(1))[0]
+        return self.df[self.df['SUBJLABEL'] == random_id]
+    
+    def get_specific_subject(self, chosen_id):
+        
+        return self.df[self.df['SUBJLABEL'] == chosen_id]
+    
+    def filter_treatment_group(self, trt_group = 'Treatment'):
+        self.df = self.df[self.df['GROUP'] == trt_group]
+        
+    def filter_NA(self):
+        # Drop NA values
+        self.df = self.df.dropna(subset = ['QLESQA_Tot'])
+    
+    def get_relevant_ids(self):
+        print("working")
+        group = self.df.groupby('SUBJLABEL')
+        relevant_ids = []
+        for id, data in group:
+            
+            # If no baseline detected, then not viable candidate
+            if "Baseline" in data['EVENTNAME'].values:
+                if "Week 8" in data['EVENTNAME'].values:
+    
+                    relevant_ids.append(id)
+
+        print(f"Number of ids that fit criteria: {len(relevant_ids)}")
+        return relevant_ids
+
+
+# def check_qlesq_criteria(df):
+#     group_df = df.groupby('SUBJLABEL')
+#     for subject, group in group_df:
+
+# #         group = group.sort_values(by = ['days_baseline'], ascending = True)
+
+# #         baseline = group.iloc[0]['totqlesq']
+# #         end_score = group.iloc[-1]['totqlesq']]
+
+
+#         assert group['QLESQA_Tot'].isna().sum() == 0, f"Total Qlesq has {group['QLESQA_Tot'].isna().sum()} NA values for {subject}"
+#         assert "Baseline" in group['EVENTNAME'].values, f"No Baseline found for {subject}"
+#         assert "Week 8" in group['EVENTNAME'].values, f"No Week 8 entry fround for {subject}"
+# #         assert group.duplicated().sum() == 0, f"Duplicate rows detected for {subject}"
+# #         assert group.shape[0] >= 2, f"Subject profile has 1 row or less, for {subject}"
+          
+def qlesq_y_gen(root_dir):
+
+    can_qlesq = pd.read_csv(root_dir  + "CBN01_QLESQ_DATA_forREVEIW.csv")
+
+    # Keep useful columns
+    important_cols = ['SUBJLABEL','EVENTNAME', 'GROUP', 'QLESQA_Tot']
+    can_qlesq = can_qlesq[important_cols]
+
+    selector = qlesq_subject_selector(can_qlesq)
+
+    selector.filter_treatment_group()
+
+    selector.filter_NA()
+
+    filtered_df = selector.df
+
+    group_df = filtered_df.groupby('SUBJLABEL')
+    relevant_ids = []
+    qlesq_y = pd.DataFrame()
+    i = 0
+    for subject, group in group_df:
+
+        if "Baseline" not in group['EVENTNAME'].values:
+            continue
+        if "Week 8" not in group['EVENTNAME'].values:
+            continue
+
+
+
+        assert group.shape[0] <= 3, f"Shouldn't be more than 4 rows for {subject}"
+        assert group.duplicated().sum() == 0, f"Duplicate rows detected for {subject}"
+        assert group['QLESQA_Tot'].isna().sum() == 0, f"Total Qlesq has {group['QLESQA_Tot'].isna().sum()} NA values for {subject}"
+        assert "Baseline" in group['EVENTNAME'].values, f"No Baseline found for {subject}"
+        assert "Week 8" in group['EVENTNAME'].values, f"No Week 8 entry fround for {subject}"
+
+        baseline = group[group['EVENTNAME'] == 'Baseline']['QLESQA_Tot'].values[0]
+        week8 = group[group['EVENTNAME'] == 'Week 8']['QLESQA_Tot'].values[0]
+
+        qlesq_y.loc[i, 'subjectkey'] = subject
+        qlesq_y.loc[i, 'baseline_qlesq'] = baseline
+        qlesq_y.loc[i, 'week8_qlesq'] = week8
+        i += 1 
+
+    print("writing qlesq_y")
+    qlesq_y.to_csv(root_dir + "canbind_qlesq_y.csv", index = False)
+
+    
 
 
 def extend_columns_eventbased(orig_df):

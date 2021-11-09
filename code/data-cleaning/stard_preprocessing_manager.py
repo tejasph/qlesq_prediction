@@ -1149,7 +1149,7 @@ def generate_qlesq_y(root_data_dir_path, days_baseline_cutoff = 77):
     qlesq_y = pd.DataFrame()
     group_qlesq = filtered_df.groupby('subjectkey')
 
-    relevant_ids = []
+    # relevant_ids = []
     i = 0 
     for subject_id, data in group_qlesq:
     #     data = data[data['days_baseline'] <= 77] # only level 1 should expect ~3000 # 78-91
@@ -1184,7 +1184,7 @@ def generate_qlesq_y(root_data_dir_path, days_baseline_cutoff = 77):
         assert pd.isna(end_lvl) == False, f"End level is NA for {subject}"
         
         
-        relevant_ids.append(id)
+        # relevant_ids.append(id)
         qlesq_y.loc[i, 'subjectkey'] = subject_id
         qlesq_y.loc[i, 'start_day'] = start_day
         qlesq_y.loc[i, 'start_qlesq'] = baseline
