@@ -282,8 +282,7 @@ def qlesq_y_gen(root_dir):
     i = 0
     for subject, group in group_df:
 
-        if "Baseline" not in group['EVENTNAME'].values:
-            continue
+
         if "Week 8" not in group['EVENTNAME'].values:
             continue
 
@@ -292,10 +291,14 @@ def qlesq_y_gen(root_dir):
         assert group.shape[0] <= 3, f"Shouldn't be more than 4 rows for {subject}"
         assert group.duplicated().sum() == 0, f"Duplicate rows detected for {subject}"
         assert group['QLESQA_Tot'].isna().sum() == 0, f"Total Qlesq has {group['QLESQA_Tot'].isna().sum()} NA values for {subject}"
-        assert "Baseline" in group['EVENTNAME'].values, f"No Baseline found for {subject}"
+        # assert "Baseline" in group['EVENTNAME'].values, f"No Baseline found for {subject}"
         assert "Week 8" in group['EVENTNAME'].values, f"No Week 8 entry fround for {subject}"
 
-        baseline = group[group['EVENTNAME'] == 'Baseline']['QLESQA_Tot'].values[0]
+        if "Baseline" not in group['EVENTNAME'].values:
+            baseline = "NA"
+        else:
+            baseline = group[group['EVENTNAME'] == 'Baseline']['QLESQA_Tot'].values[0]
+            
         week8 = group[group['EVENTNAME'] == 'Week 8']['QLESQA_Tot'].values[0]
 
         qlesq_y.loc[i, 'subjectkey'] = subject
