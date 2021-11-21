@@ -1131,10 +1131,10 @@ def generate_qlesq_y(root_data_dir_path, days_baseline_cutoff = 77):
     selector.filter_lvl_3()
 
     # Drop any rows where level is = 2 but Calltype isn't Entry or Base
-    selector.filter_inappropriate_calltype("Level 2", ['Entry','Base'])
+    # selector.filter_inappropriate_calltype("Level 2", ['Entry','Base'])
 
-    # Drop any rows where level is = Follow up but Calltype isn't Entry or Base
-    selector.filter_inappropriate_calltype("Follow up", ['Entry', 'Base'])
+    # # Drop any rows where level is = Follow up but Calltype isn't Entry or Base
+    # selector.filter_inappropriate_calltype("Follow up", ['Entry', 'Base'])
 
 
 
@@ -1154,7 +1154,14 @@ def generate_qlesq_y(root_data_dir_path, days_baseline_cutoff = 77):
     for subject_id, data in group_qlesq:
     #     data = data[data['days_baseline'] <= 77] # only level 1 should expect ~3000 # 78-91
 
+        # Sort by ascending days baseline
         sorted_data = data.sort_values(by = ['days_baseline'], ascending = True)
+
+        # If there are multiple Level 2 entries, only retain the first one
+        sorted_data = sorted_data[~(sorted_data.duplicated(['level']) & sorted_data.level.eq('Level 2'))]
+
+        # If there are multiple Follow Up entries, only retain the first one
+        sorted_data = sorted_data[~(sorted_data.duplicated(['level']) & sorted_data.level.eq('Follow up'))]
         
         if data.shape[0] <= 1:
             continue
@@ -1172,17 +1179,18 @@ def generate_qlesq_y(root_data_dir_path, days_baseline_cutoff = 77):
         if end_day <= 21 or end_day >=77:
             continue
 
-        assert data['totqlesq'].isna().sum() == 0, f"Total Qlesq has {data['totqlesq'].isna().sum()} NA values for {subject}"
-        assert data.duplicated().sum() == 0, f"Duplicate rows detected for {subject}"
-        assert data.shape[0] >= 2, f"Subject profile has 1 row or less, for {subject}"
-        assert end_day <= 77, f"End day found to be later than Week 8 (77 days), for {subject}"
-        assert end_day >= 21, f"End day found to be earlier than Week 4 (21 days), for {subject}"
-        assert start_day <= 21, f"Start day found to be later than Week 4 (21 days), for {subject}"
-        assert end_lvl != "Level 3" and end_lvl != "Level 4", f"Invalid levels for {subject}"
-        if end_lvl == "Level 2" or end_lvl == "Follow up":
-            assert end_type == "Entry" or end_type == "Base", f"Incorrect Call type () for a level 2 or follow-up score, for {subject}"
-        assert pd.isna(end_lvl) == False, f"End level is NA for {subject}"
-        
+        assert sorted_data['totqlesq'].isna().sum() == 0, f"Total Qlesq has {sorted_data['totqlesq'].isna().sum()} NA values for {subject_id}"
+        assert sorted_data.duplicated().sum() == 0, f"Duplicate rows detected for {subject_id}"
+        assert sorted_data.shape[0] >= 2, f"Subject profile has 1 row or less, for {subject_id}"
+        assert end_day <= 77, f"End day found to be later than Week 8 (77 days), for {subject_id}"
+        assert end_day >= 21, f"End day found to be earlier than Week 4 (21 days), for {subject_id}"
+        assert start_day <= 21, f"Start day found to be later than Week 4 (21 days), for {subject_id}"
+        assert end_lvl != "Level 3" and end_lvl != "Level 4", f"Invalid levels for {subject_id}"
+        # if end_lvl == "Level 2" or end_lvl == "Follow up":
+        #     assert end_type == "Entry" or end_type == "Base", f"Incorrect Call type () for a level 2 or follow-up score, for {subject}"
+        assert pd.isna(end_lvl) == False, f"End level is NA for {subject_id}"
+        assert sorted_data[sorted_data['level'] == 'Level 2'].shape[0] < 2, f"More than 2 level 2 entries used for {subject_id}" # make sure we only keep 1 level 2 entry
+        assert sorted_data[sorted_data['level'] == 'Follow up'].shape[0] < 2, f"More than 2 level 2 entries used for {subject_id}"        
         
         # relevant_ids.append(id)
         qlesq_y.loc[i, 'subjectkey'] = subject_id

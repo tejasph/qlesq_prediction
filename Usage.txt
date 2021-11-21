@@ -1,12 +1,12 @@
 Processing the STARD data:
 
-C:\Users\Tejas\Documents\star_project>python code/data-cleaning/stard_preprocessing_manager.py data/STARD_raw -a
+C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction>python code/data-cleaning/stard_preprocessing_manager.py data/STARD_raw -a
 
 note: processed datasets are generated within the STARD_Raw_Data_Used folder (suggest moving the processed data into antidep_pred_replication/data repo or change path)
 
 Processing the CANBIND data:
 
-C:\Users\Tejas\Documents\star_project\antidep_pred_replication>python code/data-cleaning/canbind_preprocessing_manager.py
+C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction>python code/data-cleaning/canbind_preprocessing_manager.py
 
 note: before running this, go into canbind_preprocessing_manager.py and alter pathData to a correct pathing for the raw data (see below)
 
@@ -20,5 +20,5 @@ note: before running this, go into canbind_preprocessing_manager.py and alter pa
 
 Create Overlapping Data from processed data:
 
-C:\Users\Tejas\Documents\star_project\antidep_pred_replication>python code/data-cleaning/generate_overlapping_features.py -both data/STARD_raw/processed_data/final_xy_data_matrices data/canbind_raw_data/
+C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction>python code/data-cleaning/generate_overlapping_features.py -both data/STARD_raw/processed_data/final_xy_data_matrices data/canbind_raw_data/
 
