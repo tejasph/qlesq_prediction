@@ -224,9 +224,16 @@ class qlesq_subject_selector():
     def filter_treatment_group(self, trt_group = 'Treatment'):
         self.df = self.df[self.df['GROUP'] == trt_group]
         
-    def filter_NA(self):
+    def filter_NA(self, subset_cols = ['QLESQA_Tot', 'QLESQB_Tot']):
         # Drop NA values
-        self.df = self.df.dropna(subset = ['QLESQA_Tot'])
+        self.df = self.df.dropna(subset = subset_cols, how = 'all')
+    
+    def merge_QLESQ_AB(self):
+
+        # Fill nas with 0 and then simply add to retain qlesq total (note: this is kind of hacky)
+        self.df = self.df.fillna(value = {'QLESQA_Tot': 0, 'QLESQB_Tot': 0})
+        self.df['total_QLESQ'] = self.df['QLESQA_Tot'] + self.df['QLESQB_Tot'] 
+        self.df = self.df.drop(columns = ['QLESQA_Tot', 'QLESQB_Tot'])
     
     def get_relevant_ids(self):
         print("working")
@@ -265,7 +272,7 @@ def qlesq_y_gen(root_dir):
     can_qlesq = pd.read_csv(root_dir  + "CBN01_QLESQ_DATA_forREVEIW.csv")
 
     # Keep useful columns
-    important_cols = ['SUBJLABEL','EVENTNAME', 'GROUP', 'QLESQA_Tot']
+    important_cols = ['SUBJLABEL','EVENTNAME', 'GROUP', 'QLESQA_Tot', 'QLESQB_Tot']
     can_qlesq = can_qlesq[important_cols]
 
     selector = qlesq_subject_selector(can_qlesq)
@@ -273,6 +280,8 @@ def qlesq_y_gen(root_dir):
     selector.filter_treatment_group()
 
     selector.filter_NA()
+
+    selector.merge_QLESQ_AB()
 
     filtered_df = selector.df
 
@@ -286,20 +295,23 @@ def qlesq_y_gen(root_dir):
         if "Week 8" not in group['EVENTNAME'].values:
             continue
 
+        if "Baseline" not in group['EVENTNAME'].values:
+            continue
+
 
 
         assert group.shape[0] <= 3, f"Shouldn't be more than 4 rows for {subject}"
         assert group.duplicated().sum() == 0, f"Duplicate rows detected for {subject}"
-        assert group['QLESQA_Tot'].isna().sum() == 0, f"Total Qlesq has {group['QLESQA_Tot'].isna().sum()} NA values for {subject}"
-        # assert "Baseline" in group['EVENTNAME'].values, f"No Baseline found for {subject}"
+        assert group['total_QLESQ'].isna().sum() == 0, f"Total Qlesq has {group['total_QLESQ'].isna().sum()} NA values for {subject}"
+        assert "Baseline" in group['EVENTNAME'].values, f"No Baseline found for {subject}"
         assert "Week 8" in group['EVENTNAME'].values, f"No Week 8 entry fround for {subject}"
 
-        if "Baseline" not in group['EVENTNAME'].values:
-            baseline = "NA"
-        else:
-            baseline = group[group['EVENTNAME'] == 'Baseline']['QLESQA_Tot'].values[0]
+        # if "Baseline" not in group['EVENTNAME'].values:
+        #     baseline = "NA"
+        # else:
+        baseline = group[group['EVENTNAME'] == 'Baseline']['total_QLESQ'].values[0]
             
-        week8 = group[group['EVENTNAME'] == 'Week 8']['QLESQA_Tot'].values[0]
+        week8 = group[group['EVENTNAME'] == 'Week 8']['total_QLESQ'].values[0]
 
         qlesq_y.loc[i, 'subjectkey'] = subject
         qlesq_y.loc[i, 'baseline_qlesq'] = baseline
