@@ -318,6 +318,8 @@ def qlesq_y_gen(root_dir):
         qlesq_y.loc[i, 'week8_qlesq'] = week8
         i += 1 
 
+    # Rename columns for future script compatability
+    qlesq_y.columns = ['subjectkey', 'start_qlesq', 'end_qlesq']
     print("writing qlesq_y")
     qlesq_y.to_csv(root_dir + "canbind_qlesq_y.csv", index = False)
 

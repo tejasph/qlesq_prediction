@@ -1098,7 +1098,7 @@ def check_qlesq_criteria(df):
 
 
 
-def generate_qlesq_y(root_data_dir_path, days_baseline_cutoff = 77):
+def generate_qlesq_y(root_data_dir_path, output_name,  days_baseline_cutoff = 77):
 
     output_dir_path = root_data_dir_path + "/" + DIR_PROCESSED_DATA
     output_y_dir_path = output_dir_path + "/" + DIR_Y_MATRIX + "/"
@@ -1128,7 +1128,10 @@ def generate_qlesq_y(root_data_dir_path, days_baseline_cutoff = 77):
     selector.filter_duplicates()
 
     # Exclude Level 3
-    selector.filter_lvl_3()
+    selector.filter_lvl("Level 3")
+
+    # Exclude level 4
+    selector.filter_lvl("Level 4")
 
     # Drop any rows where level is = 2 but Calltype isn't Entry or Base
     # selector.filter_inappropriate_calltype("Level 2", ['Entry','Base'])
@@ -1176,13 +1179,13 @@ def generate_qlesq_y(root_data_dir_path, days_baseline_cutoff = 77):
         if start_day >= 21:  #8-21
             continue
         
-        if end_day <= 21 or end_day >=77:
+        if end_day <= 21 or end_day >= days_baseline_cutoff:
             continue
 
         assert sorted_data['totqlesq'].isna().sum() == 0, f"Total Qlesq has {sorted_data['totqlesq'].isna().sum()} NA values for {subject_id}"
         assert sorted_data.duplicated().sum() == 0, f"Duplicate rows detected for {subject_id}"
         assert sorted_data.shape[0] >= 2, f"Subject profile has 1 row or less, for {subject_id}"
-        assert end_day <= 77, f"End day found to be later than Week 8 (77 days), for {subject_id}"
+        assert end_day <= days_baseline_cutoff, f"End day found to be later than {days_baseline_cutoff}, for {subject_id}"
         assert end_day >= 21, f"End day found to be earlier than Week 4 (21 days), for {subject_id}"
         assert start_day <= 21, f"Start day found to be later than Week 4 (21 days), for {subject_id}"
         assert end_lvl != "Level 3" and end_lvl != "Level 4", f"Invalid levels for {subject_id}"
@@ -1201,7 +1204,7 @@ def generate_qlesq_y(root_data_dir_path, days_baseline_cutoff = 77):
         qlesq_y.loc[i, 'end_lvl'] = end_lvl
         i += 1
 
-    qlesq_y.to_csv(output_y_dir_path + "y_qlesq" + CSV_SUFFIX, index=False)
+    qlesq_y.to_csv(output_y_dir_path + output_name + CSV_SUFFIX, index=False)
 
     
 
@@ -1256,7 +1259,9 @@ def select_subjects(root_data_dir_path):
     y_wk8_resp_mag_qids_sr= pd.read_csv(input_y_generation_dir_path + "/y_wk8_resp_mag_qids_sr" + CSV_SUFFIX)
 
     # Handle the qlesq stuff
-    y_qlesq = pd.read_csv(input_y_generation_dir_path + "/y_qlesq" + CSV_SUFFIX)
+    y_qlesq_77 = pd.read_csv(input_y_generation_dir_path + "/y_qlesq_77" + CSV_SUFFIX)
+    y_qlesq_91 = pd.read_csv(input_y_generation_dir_path + "/y_qlesq_91" + CSV_SUFFIX)
+
 
     # Handle the week8 remission stuff
     y_wk8_rem_qids_c = pd.read_csv(input_y_generation_dir_path + "/y_wk8_rem_qids_c" + CSV_SUFFIX)
@@ -1281,7 +1286,8 @@ def select_subjects(root_data_dir_path):
     y_wk8_resp_mag_qids_sr__final = y_wk8_resp_mag_qids_sr[y_wk8_resp_mag_qids_sr.subjectkey.isin(X_tillwk4_qids_sr__final.subjectkey)]
 
     # Subset qlesq y with X-sr dataset
-    y_qlesq__final = y_qlesq[y_qlesq.subjectkey.isin(X_tillwk4_qids_sr.subjectkey)]
+    y_qlesq_77__final = y_qlesq_77[y_qlesq_77.subjectkey.isin(X_tillwk4_qids_sr.subjectkey)]
+    y_qlesq_91__final = y_qlesq_91[y_qlesq_91.subjectkey.isin(X_tillwk4_qids_sr.subjectkey)]
 
     # Also do a form of the lvl 2 remission (TRD) to match the week 4 inclusion criteria
     y_lvl2_rem_qids_c_tillwk4__final = y_lvl2_rem_qids_tillwk4_c[y_lvl2_rem_qids_tillwk4_c.subjectkey.isin(X_tillwk4_qids_c__final.subjectkey)]
@@ -1302,7 +1308,8 @@ def select_subjects(root_data_dir_path):
     y_wk8_rem_qids_sr__final = y_wk8_rem_qids_sr__final.sort_values(by=['subjectkey'])
 
     # Sorting qlesq
-    y_qlesq__final = y_qlesq__final.sort_values(by = ['subjectkey'])
+    y_qlesq_77__final = y_qlesq_77__final.sort_values(by = ['subjectkey'])
+    y_qlesq_91__final = y_qlesq_91__final.sort_values(by = ['subjectkey'])
     
     y_lvl2_rem_qids_c_tillwk4__final = y_lvl2_rem_qids_c_tillwk4__final.sort_values(by=['subjectkey'])
     
@@ -1336,7 +1343,8 @@ def select_subjects(root_data_dir_path):
     y_wk8_resp_mag_qids_sr_nolvl1drop.to_csv(output_subject_selected_path + "y_wk8_resp_mag_qids_sr_nolvl1drop" + CSV_SUFFIX, index=False)
     y_wk8_resp_mag_qids_c_nolvl1drop.to_csv(output_subject_selected_path + "y_wk8_resp_mag_qids_c_nolvl1drop" + CSV_SUFFIX, index=False)
 
-    y_qlesq__final.to_csv(output_subject_selected_path + "y_qlesq__final" + CSV_SUFFIX, index=False)
+    y_qlesq_77__final.to_csv(output_subject_selected_path + "y_qlesq_77__final" + CSV_SUFFIX, index=False)
+    y_qlesq_91__final.to_csv(output_subject_selected_path + "y_qlesq_91__final" + CSV_SUFFIX, index=False)
     
     print("Files written to: ", output_subject_selected_path)
 
@@ -1405,7 +1413,8 @@ if __name__ == "__main__":
         aggregate_rows(data_dir_path)
         impute(data_dir_path)
         generate_y(data_dir_path)
-        generate_qlesq_y(data_dir_path, days_baseline_cutoff = 77)
+        generate_qlesq_y(data_dir_path, "y_qlesq_77", days_baseline_cutoff = 77)
+        generate_qlesq_y(data_dir_path, "y_qlesq_91", days_baseline_cutoff = 91)
         select_subjects(data_dir_path)
 
         print("\nSteps complete:\n" +

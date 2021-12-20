@@ -29,8 +29,8 @@ class subject_selector():
         self.df = self.df.drop_duplicates()
         print(self.df.shape)
     
-    def filter_lvl_3(self):    
-        self.df = self.df.drop(self.df[self.df['level'] == 'Level 3'].index)
+    def filter_lvl(self, lvl):    
+        self.df = self.df.drop(self.df[self.df['level'] == lvl].index)
         print(self.df.shape)
         
     def filter_inappropriate_calltype(self, lvl, calltype = ['Entry', 'Base']):
