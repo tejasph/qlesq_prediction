@@ -22,3 +22,9 @@ Create Overlapping Data from processed data:
 
 C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction>python code/data-cleaning/generate_overlapping_features.py -both data/STARD_raw/processed_data/final_xy_data_matrices data/canbind_raw_data/
 
+Create y targets:
+
+python code/create_targets.py data/STARD_raw/processed_data/final_xy_data_matrices/y_qlesq_77__final
+
+python code/create_targets.py data/STARD_raw/processed_data/final_xy_data_matrices/y_qlesq_91__final
+

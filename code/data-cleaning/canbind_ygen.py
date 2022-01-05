@@ -227,13 +227,26 @@ class qlesq_subject_selector():
     def filter_NA(self, subset_cols = ['QLESQA_Tot', 'QLESQB_Tot']):
         # Drop NA values
         self.df = self.df.dropna(subset = subset_cols, how = 'all')
-    
-    def merge_QLESQ_AB(self):
 
-        # Fill nas with 0 and then simply add to retain qlesq total (note: this is kind of hacky)
-        self.df = self.df.fillna(value = {'QLESQA_Tot': 0, 'QLESQB_Tot': 0})
-        self.df['total_QLESQ'] = self.df['QLESQA_Tot'] + self.df['QLESQB_Tot'] 
-        self.df = self.df.drop(columns = ['QLESQA_Tot', 'QLESQB_Tot'])
+    def filter_min_entries(self):
+        
+        group = self.df.groupby("SUBJLABEL")
+        relevant_ids = []
+        for id, data in group:
+            
+            #If no baseline detected, then not viable candidate
+            if "Baseline" in data['EVENTNAME'].values:
+                if "Week 8" in data['EVENTNAME'].values:
+                    relevant_ids.append(id)
+        
+        self.df = self.df[self.df['SUBJLABEL'].isin(relevant_ids)]
+    
+    # def merge_QLESQ_AB(self):
+
+    #     # Fill nas with 0 and then simply add to retain qlesq total (note: this is kind of hacky)
+    #     self.df = self.df.fillna(value = {'QLESQA_Tot': 0, 'QLESQB_Tot': 0})
+    #     self.df['total_QLESQ'] = self.df['QLESQA_Tot'] + self.df['QLESQB_Tot'] 
+    #     self.df = self.df.drop(columns = ['QLESQA_Tot', 'QLESQB_Tot'])
     
     def get_relevant_ids(self):
         print("working")
@@ -250,7 +263,15 @@ class qlesq_subject_selector():
         print(f"Number of ids that fit criteria: {len(relevant_ids)}")
         return relevant_ids
 
-
+def generate_col_names(root, i = 14):
+    '''
+    Helper function to create column names
+    '''
+    col_list = []
+    for num in range(1, i + 1):
+        col_list.append(root + str(num))
+        
+    return col_list
 # def check_qlesq_criteria(df):
 #     group_df = df.groupby('SUBJLABEL')
 #     for subject, group in group_df:
@@ -272,21 +293,61 @@ def qlesq_y_gen(root_dir):
     can_qlesq = pd.read_csv(root_dir  + "CBN01_QLESQ_DATA_forREVEIW.csv")
 
     # Keep useful columns
-    important_cols = ['SUBJLABEL','EVENTNAME', 'GROUP', 'QLESQA_Tot', 'QLESQB_Tot']
-    can_qlesq = can_qlesq[important_cols]
+    cols_to_drop = ['SITESYMBOL', 'Cohort_ID', 'AGE', 'SEX','VISITDATE', 'Dosage_ID']
+    can_qlesq = can_qlesq.drop(columns = cols_to_drop)
 
     selector = qlesq_subject_selector(can_qlesq)
 
+    # Only keep treatment group
     selector.filter_treatment_group()
 
+    # Remove rows with NA for total QLESQ score (In Both A and B columns)
     selector.filter_NA()
 
-    selector.merge_QLESQ_AB()
+    # Only keep ids where a Baseline and a Week 8 score are present
+    selector.filter_min_entries()
 
-    filtered_df = selector.df
+    # We expect 176 valid entries for CanBind as per checks in Jupyter Lab
+    
+    # Generate some column names that correspond to raw excel file
+    A_columns = generate_col_names("QLESQ_1A_")
+    B_columns = generate_col_names("QLESQ_1B_")
+
+    #Iterate over each row and gather QLESQ values
+    max_raw_total = []
+    actual_raw_total = []
+    for index, row in selector.df.iterrows():
+        # A_column path
+        if row['QLESQ_0'] == 'Y':
+            answer_counter = 0
+            for col in A_columns:
+                # Check if person answer all questions --> calculate max possible score
+                if np.isnan(row[col]) == False:
+                    answer_counter += 1
+            max_raw_total.append(answer_counter* 5)
+            actual_raw_total.append(row['QLESQA_Tot'])
+
+        #B column path
+        if row['QLESQ_0'] == 'N':
+            answer_counter = 0
+            for col in B_columns:
+                # Check if person answer all questions --> calculate max possible score
+                if np.isnan(row[col]) == False:
+                    answer_counter += 1
+            max_raw_total.append(answer_counter* 5)
+            actual_raw_total.append(row['QLESQB_Tot'])
+
+    # Merge A and B totals to get one communal QLESQ total column --> 'total_QLESQ'
+    # selector.merge_QLESQ_AB()
+    selector.df['max_raw_total'] = max_raw_total
+    selector.df['total_QLESQ'] = actual_raw_total
+
+
+    filtered_df = selector.df.copy()
+
+
 
     group_df = filtered_df.groupby('SUBJLABEL')
-    relevant_ids = []
     qlesq_y = pd.DataFrame()
     i = 0
     for subject, group in group_df:
@@ -310,16 +371,20 @@ def qlesq_y_gen(root_dir):
         #     baseline = "NA"
         # else:
         baseline = group[group['EVENTNAME'] == 'Baseline']['total_QLESQ'].values[0]
+        baseline_max_potential = group[group['EVENTNAME'] == 'Baseline']['max_raw_total'].values[0]
             
         week8 = group[group['EVENTNAME'] == 'Week 8']['total_QLESQ'].values[0]
+        week8_max_potential = group[group['EVENTNAME'] == 'Week 8']['max_raw_total'].values[0]
 
         qlesq_y.loc[i, 'subjectkey'] = subject
         qlesq_y.loc[i, 'baseline_qlesq'] = baseline
+        qlesq_y.loc[i, 'baseline_max_qlesq'] = baseline_max_potential
         qlesq_y.loc[i, 'week8_qlesq'] = week8
+        qlesq_y.loc[i, 'week8_max_qlesq'] = week8_max_potential
         i += 1 
 
     # Rename columns for future script compatability
-    qlesq_y.columns = ['subjectkey', 'start_qlesq', 'end_qlesq']
+    qlesq_y.columns = ['subjectkey', 'start_qlesq','baseline_max_qlesq', 'end_qlesq','week8_max_qlesq']
     print("writing qlesq_y")
     qlesq_y.to_csv(root_dir + "canbind_qlesq_y.csv", index = False)
 
