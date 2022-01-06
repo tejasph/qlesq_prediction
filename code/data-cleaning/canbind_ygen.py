@@ -316,6 +316,7 @@ def qlesq_y_gen(root_dir):
     #Iterate over each row and gather QLESQ values
     max_raw_total = []
     actual_raw_total = []
+    transformed_total = []
     for index, row in selector.df.iterrows():
         # A_column path
         if row['QLESQ_0'] == 'Y':
@@ -324,8 +325,9 @@ def qlesq_y_gen(root_dir):
                 # Check if person answer all questions --> calculate max possible score
                 if np.isnan(row[col]) == False:
                     answer_counter += 1
-            max_raw_total.append(answer_counter* 5)
-            actual_raw_total.append(row['QLESQA_Tot'])
+
+            max_raw = answer_counter * 5
+            actual_raw = row['QLESQA_Tot']
 
         #B column path
         if row['QLESQ_0'] == 'N':
@@ -334,18 +336,21 @@ def qlesq_y_gen(root_dir):
                 # Check if person answer all questions --> calculate max possible score
                 if np.isnan(row[col]) == False:
                     answer_counter += 1
-            max_raw_total.append(answer_counter* 5)
-            actual_raw_total.append(row['QLESQB_Tot'])
+
+            max_raw = answer_counter * 5
+            actual_raw = row['QLESQB_Tot']
+
+        max_raw_total.append(max_raw)
+        actual_raw_total.append(actual_raw)
+        transformed_total.append(round((actual_raw - answer_counter)/(max_raw - answer_counter)*100, 1))
 
     # Merge A and B totals to get one communal QLESQ total column --> 'total_QLESQ'
     # selector.merge_QLESQ_AB()
     selector.df['max_raw_total'] = max_raw_total
-    selector.df['total_QLESQ'] = actual_raw_total
-
+    selector.df['total_raw_QLESQ'] = actual_raw_total
+    selector.df['transformed_qlesq'] = transformed_total
 
     filtered_df = selector.df.copy()
-
-
 
     group_df = filtered_df.groupby('SUBJLABEL')
     qlesq_y = pd.DataFrame()
@@ -363,28 +368,32 @@ def qlesq_y_gen(root_dir):
 
         assert group.shape[0] <= 3, f"Shouldn't be more than 4 rows for {subject}"
         assert group.duplicated().sum() == 0, f"Duplicate rows detected for {subject}"
-        assert group['total_QLESQ'].isna().sum() == 0, f"Total Qlesq has {group['total_QLESQ'].isna().sum()} NA values for {subject}"
+        assert group['transformed_qlesq'].isna().sum() == 0, f"Total Qlesq has {group['transformed_qlesq'].isna().sum()} NA values for {subject}"
         assert "Baseline" in group['EVENTNAME'].values, f"No Baseline found for {subject}"
         assert "Week 8" in group['EVENTNAME'].values, f"No Week 8 entry fround for {subject}"
 
         # if "Baseline" not in group['EVENTNAME'].values:
         #     baseline = "NA"
         # else:
-        baseline = group[group['EVENTNAME'] == 'Baseline']['total_QLESQ'].values[0]
-        baseline_max_potential = group[group['EVENTNAME'] == 'Baseline']['max_raw_total'].values[0]
+        baseline = group[group['EVENTNAME'] == 'Baseline']['transformed_qlesq'].values[0]
+        baseline_max_raw = group[group['EVENTNAME'] == 'Baseline']['max_raw_total'].values[0]
+        baseline_actual_raw = group[group['EVENTNAME'] == 'Baseline']['total_raw_QLESQ'].values[0]
             
-        week8 = group[group['EVENTNAME'] == 'Week 8']['total_QLESQ'].values[0]
-        week8_max_potential = group[group['EVENTNAME'] == 'Week 8']['max_raw_total'].values[0]
+        week8 = group[group['EVENTNAME'] == 'Week 8']['transformed_qlesq'].values[0]
+        week8_max_raw = group[group['EVENTNAME'] == 'Week 8']['max_raw_total'].values[0]
+        week8_actual_raw = group[group['EVENTNAME'] == 'Week 8']['total_raw_QLESQ'].values[0]
 
         qlesq_y.loc[i, 'subjectkey'] = subject
-        qlesq_y.loc[i, 'baseline_qlesq'] = baseline
-        qlesq_y.loc[i, 'baseline_max_qlesq'] = baseline_max_potential
-        qlesq_y.loc[i, 'week8_qlesq'] = week8
-        qlesq_y.loc[i, 'week8_max_qlesq'] = week8_max_potential
+        qlesq_y.loc[i, 'start_qlesq'] = baseline
+        qlesq_y.loc[i, 'baseline_max_raw'] = baseline_max_raw
+        qlesq_y.loc[i, 'baseline_actual_raw'] = baseline_actual_raw
+        qlesq_y.loc[i, 'end_qlesq'] = week8
+        qlesq_y.loc[i, 'week8_max_raw'] = week8_max_raw
+        qlesq_y.loc[i, 'week8_actual_raw'] = week8_actual_raw
         i += 1 
 
     # Rename columns for future script compatability
-    qlesq_y.columns = ['subjectkey', 'start_qlesq','baseline_max_qlesq', 'end_qlesq','week8_max_qlesq']
+ 
     print("writing qlesq_y")
     qlesq_y.to_csv(root_dir + "canbind_qlesq_y.csv", index = False)
 
