@@ -2,13 +2,12 @@ Processing the STARD data:
 
 C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction>python code/data-cleaning/stard_preprocessing_manager.py data/STARD_raw -a
 
-note: processed datasets are generated within the STARD_Raw_Data_Used folder (suggest moving the processed data into antidep_pred_replication/data repo or change path)
 
 Processing the CANBIND data:
 
 C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction>python code/data-cleaning/canbind_preprocessing_manager.py
 
-note: before running this, go into canbind_preprocessing_manager.py and alter pathData to a correct pathing for the raw data (see below)
+note: before running this, go into canbind_preprocessing_manager.py and alter pathData to a correct pathing for the raw data (see below; will be different depending on the user)
 
     elif len(sys.argv) == 1:
         pathData = r'C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\data\canbind_raw_data'
@@ -27,4 +26,6 @@ Create y targets:
 python code/create_targets.py data/STARD_raw/processed_data/final_xy_data_matrices/y_qlesq_77__final
 
 python code/create_targets.py data/STARD_raw/processed_data/final_xy_data_matrices/y_qlesq_91__final
+
+python code/create_targets.py data/canbind_raw_data/q-les-q/canbind_qlesq_y
 
