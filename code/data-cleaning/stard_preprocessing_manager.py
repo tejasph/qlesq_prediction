@@ -1362,13 +1362,13 @@ def handle_subject_selection_conditions(input_row_selected_dir_path, X, y_df, qi
     y = y_df.dropna(axis='rows') # Drop subjects lacking a y value
     X = X[X["subjectkey"].isin(y["subjectkey"])]
     
-    # # Select subjects that have ucq entries, aka eliminate subjects that don't have ucq entries, as a proxy for the small amount of subjects missing most patients. 
-    # file_ucq = pd.read_csv(input_row_selected_dir_path + "/rs__ucq01" + CSV_SUFFIX)
-    # X = X[X["subjectkey"].isin(file_ucq["subjectkey"])]
+    # Select subjects that have ucq entries, aka eliminate subjects that don't have ucq entries, as a proxy for the small amount of subjects missing most patients. 
+    file_ucq = pd.read_csv(input_row_selected_dir_path + "/rs__ucq01" + CSV_SUFFIX)
+    X = X[X["subjectkey"].isin(file_ucq["subjectkey"])]
     
-    # # Eliminate subjects that don't have week0 QIDS entries from either QIDS-C or QIDS-SR
-    # file_qids01_w0c = pd.read_csv(input_row_selected_dir_path + "/rs__qids01_w0" + qids_version + CSV_SUFFIX)
-    # X = X[X["subjectkey"].isin(file_qids01_w0c["subjectkey"])]
+    # Eliminate subjects that don't have week0 QIDS entries from either QIDS-C or QIDS-SR
+    file_qids01_w0c = pd.read_csv(input_row_selected_dir_path + "/rs__qids01_w0" + qids_version + CSV_SUFFIX)
+    X = X[X["subjectkey"].isin(file_qids01_w0c["subjectkey"])]
 
     return X
 
