@@ -821,256 +821,256 @@ def one_hot_encode(df, columns):
 def drop_empty_columns(df):
     return df.dropna(axis="columns", how="all")  # Drop columns that are all empty
 
-def generate_y(root_data_dir_path):
-    output_dir_path = root_data_dir_path + "/" + DIR_PROCESSED_DATA
-    output_y_dir_path = output_dir_path + "/" + DIR_Y_MATRIX + "/"
+# def generate_y(root_data_dir_path):
+#     output_dir_path = root_data_dir_path + "/" + DIR_PROCESSED_DATA
+#     output_y_dir_path = output_dir_path + "/" + DIR_Y_MATRIX + "/"
 
-    print("\n--------------------------------7. Y MATRIX GENERATION-----------------------------------\n")
+#     print("\n--------------------------------7. Y MATRIX GENERATION-----------------------------------\n")
 
-    #y_lvl2_rem_qids_c = pd.DataFrame()
-    #y_lvl2_rem_qids_sr = pd.DataFrame()
-    #y_wk8_resp_qids_c = pd.DataFrame()
-    #y_wk8_resp_qids_sr = pd.DataFrame()
-    y_wk8_rem_qids_c = pd.DataFrame()
-    y_wk8_rem_qids_sr = pd.DataFrame()
+#     #y_lvl2_rem_qids_c = pd.DataFrame()
+#     #y_lvl2_rem_qids_sr = pd.DataFrame()
+#     #y_wk8_resp_qids_c = pd.DataFrame()
+#     #y_wk8_resp_qids_sr = pd.DataFrame()
+#     y_wk8_rem_qids_c = pd.DataFrame()
+#     y_wk8_rem_qids_sr = pd.DataFrame()
 
-    for filename in os.listdir(root_data_dir_path):
-        if not os.path.exists(output_dir_path):
-            os.mkdir(output_dir_path)
-        if not os.path.exists(output_y_dir_path):
-            os.mkdir(output_y_dir_path)
+#     for filename in os.listdir(root_data_dir_path):
+#         if not os.path.exists(output_dir_path):
+#             os.mkdir(output_dir_path)
+#         if not os.path.exists(output_y_dir_path):
+#             os.mkdir(output_y_dir_path)
 
-        scale_name = filename.split(".")[0]
-        if scale_name not in ['ccv01', 'qids01']:
-            continue
+#         scale_name = filename.split(".")[0]
+#         if scale_name not in ['ccv01', 'qids01']:
+#             continue
 
-        curr_scale_path = root_data_dir_path + "/" + filename
+#         curr_scale_path = root_data_dir_path + "/" + filename
 
-        # Read in the txt file + preliminary processing
-        scale_df = pd.read_csv(curr_scale_path, sep='\t', skiprows=[1])
+#         # Read in the txt file + preliminary processing
+#         scale_df = pd.read_csv(curr_scale_path, sep='\t', skiprows=[1])
 
-        print(LINE_BREAK)
-        print("Handling scale = ", scale_name)
+#         print(LINE_BREAK)
+#         print("Handling scale = ", scale_name)
 
-        # Reversed 0 and 1 from previous; 1 is now TRD, 0 is non-TRD, as we're predicting TRD. 
-        if scale_name == "qids01":
+#         # Reversed 0 and 1 from previous; 1 is now TRD, 0 is non-TRD, as we're predicting TRD. 
+#         if scale_name == "qids01":
             
-            over21_df = scale_df.loc[scale_df['days_baseline'] > 21] # New, use this to check subjects remained 4 weeks. 
+#             over21_df = scale_df.loc[scale_df['days_baseline'] > 21] # New, use this to check subjects remained 4 weeks. 
             
-            for vers in ['c', 'sr']:
-                y_lvl2_rem_qids01 = pd.DataFrame()
-                y_wk8_resp_qids01 = pd.DataFrame()
-                y_lvl2_rem_qids01_tillwk4 = pd.DataFrame()
+#             for vers in ['c', 'sr']:
+#                 y_lvl2_rem_qids01 = pd.DataFrame()
+#                 y_wk8_resp_qids01 = pd.DataFrame()
+#                 y_lvl2_rem_qids01_tillwk4 = pd.DataFrame()
 
-                # Adding magnitude df
-                y_wk8_resp_magnitude_qids01 = pd.DataFrame()
+#                 # Adding magnitude df
+#                 y_wk8_resp_magnitude_qids01 = pd.DataFrame()
                 
-                if vers == 'c': 
-                    version_form = 'Clinician'
-                elif vers == 'sr': 
-                    version_form = 'Self Rating'
-                else:
-                    Exception()
+#                 if vers == 'c': 
+#                     version_form = 'Clinician'
+#                 elif vers == 'sr': 
+#                     version_form = 'Self Rating'
+#                 else:
+#                     Exception()
                 
-                i = 0
-                for id, group in scale_df.groupby(['subjectkey']):
-                    if id in over21_df['subjectkey'].values: # Only generate y if this subject stayed in study for 4 weeks             
-                        y_lvl2_rem_qids01.loc[i, "subjectkey"] = id
-                        y_lvl2_rem_qids01_tillwk4.loc[i, "subjectkey"] = id # Second version that assigns TRD to dropouts, not used by Nie et al
-                        y_lvl2_rem_qids01_tillwk4.loc[i, "target"] = 1 # Default these all to TRD
-                        subset = group[(group['level'] == "Level 2") | (group['level'] == "Level 2.1")]
-                        # Assign 1 to all subjects who make it to Level 2 or 2.1. This will allow exclusion of patients who
-                        # do not remit in Level 1 and then drop out
-                        if subset.shape[0] > 0:
-                            y_lvl2_rem_qids01.loc[i, "target"] = 1
+#                 i = 0
+#                 for id, group in scale_df.groupby(['subjectkey']):
+#                     if id in over21_df['subjectkey'].values: # Only generate y if this subject stayed in study for 4 weeks             
+#                         y_lvl2_rem_qids01.loc[i, "subjectkey"] = id
+#                         y_lvl2_rem_qids01_tillwk4.loc[i, "subjectkey"] = id # Second version that assigns TRD to dropouts, not used by Nie et al
+#                         y_lvl2_rem_qids01_tillwk4.loc[i, "target"] = 1 # Default these all to TRD
+#                         subset = group[(group['level'] == "Level 2") | (group['level'] == "Level 2.1")]
+#                         # Assign 1 to all subjects who make it to Level 2 or 2.1. This will allow exclusion of patients who
+#                         # do not remit in Level 1 and then drop out
+#                         if subset.shape[0] > 0:
+#                             y_lvl2_rem_qids01.loc[i, "target"] = 1
                     
-                        # Assign 0 to all subjects who achieve QIDS-C remission in Levels 1,2,2.1
-                        subset_rems = group[(group['version_form'] == version_form) & (group['qstot'] <= 5) & ((group['level'] == "Level 1" ) | (group['level'] == "Level 2" ) | (group['level'] == "Level 2.1" ) )]
-                        if subset_rems.shape[0] > 0:
-                            y_lvl2_rem_qids01.loc[i, "target"] = 0
-                            y_lvl2_rem_qids01_tillwk4.loc[i, "target"] = 0
+#                         # Assign 0 to all subjects who achieve QIDS-C remission in Levels 1,2,2.1
+#                         subset_rems = group[(group['version_form'] == version_form) & (group['qstot'] <= 5) & ((group['level'] == "Level 1" ) | (group['level'] == "Level 2" ) | (group['level'] == "Level 2.1" ) )]
+#                         if subset_rems.shape[0] > 0:
+#                             y_lvl2_rem_qids01.loc[i, "target"] = 0
+#                             y_lvl2_rem_qids01_tillwk4.loc[i, "target"] = 0
     
-                        i += 1
+#                         i += 1
                 
-                # creating magnitude change y_labels
-                i = 0
-                for id, group in scale_df.groupby(['subjectkey']):
-                    if id in over21_df['subjectkey'].values: # Only generate y if this subject stayed in study for 4 weeks             
-                        # Grab the baseline entry
-                        subset = group[(group['version_form'] == version_form) & (group['days_baseline'] <= 77)]
+#                 # creating magnitude change y_labels
+#                 i = 0
+#                 for id, group in scale_df.groupby(['subjectkey']):
+#                     if id in over21_df['subjectkey'].values: # Only generate y if this subject stayed in study for 4 weeks             
+#                         # Grab the baseline entry
+#                         subset = group[(group['version_form'] == version_form) & (group['days_baseline'] <= 77)]
 
-                        # Added due to a bug where there is nan qstot at days_baseline = 0
-                        subset = subset[subset['qstot'].notna()]
+#                         # Added due to a bug where there is nan qstot at days_baseline = 0
+#                         subset = subset[subset['qstot'].notna()]
 
-                        if subset.shape[0] == 0:
-                            continue
+#                         if subset.shape[0] == 0:
+#                             continue
 
-                        sorted_subset = subset.sort_values(by=['days_baseline'], ascending = False)
+#                         sorted_subset = subset.sort_values(by=['days_baseline'], ascending = False)
 
-                        baseline = sorted_subset.iloc[-1]['qstot']  # take bottom point for end score
+#                         baseline = sorted_subset.iloc[-1]['qstot']  # take bottom point for end score
 
 
-                        end_score = sorted_subset.iloc[0]['qstot']
-                        end_day = sorted_subset.iloc[0]['days_baseline']                       
+#                         end_score = sorted_subset.iloc[0]['qstot']
+#                         end_day = sorted_subset.iloc[0]['days_baseline']                       
 
                         
-                        if baseline < 6:
-                            ValueError('woh there was a baseline value less than 5!')
-                            continue
-                        # Establish a starting max_diff and then largest qstot magnitude change from baseline
-                        # max_diff = 0
-                        # for k, row in subset.iterrows():
-                        #     diff = row['qstot'] - baseline
-                        #     if abs(diff) > abs(max_diff):
-                        #         max_diff = diff
-                        max_diff = end_score - baseline
+#                         if baseline < 6:
+#                             ValueError('woh there was a baseline value less than 5!')
+#                             continue
+#                         # Establish a starting max_diff and then largest qstot magnitude change from baseline
+#                         # max_diff = 0
+#                         # for k, row in subset.iterrows():
+#                         #     diff = row['qstot'] - baseline
+#                         #     if abs(diff) > abs(max_diff):
+#                         #         max_diff = diff
+#                         max_diff = end_score - baseline
 
-                        if end_day > 21:
-                            y_wk8_resp_magnitude_qids01.loc[i, "subjectkey"] = id
-                            y_wk8_resp_magnitude_qids01.loc[i,"baseline_score"] = baseline                            
-                            y_wk8_resp_magnitude_qids01.loc[i, "target_change"] = max_diff
-                            y_wk8_resp_magnitude_qids01.loc[i, "target_score"] = end_score # get's us the the final score
+#                         if end_day > 21:
+#                             y_wk8_resp_magnitude_qids01.loc[i, "subjectkey"] = id
+#                             y_wk8_resp_magnitude_qids01.loc[i,"baseline_score"] = baseline                            
+#                             y_wk8_resp_magnitude_qids01.loc[i, "target_change"] = max_diff
+#                             y_wk8_resp_magnitude_qids01.loc[i, "target_score"] = end_score # get's us the the final score
                         
-                    i += 1
-                print(f"Shape of y_mag {y_wk8_resp_magnitude_qids01.shape}")
+#                     i += 1
+#                 print(f"Shape of y_mag {y_wk8_resp_magnitude_qids01.shape}")
     
-                # Create CAN-BIND overlapping targets with QIDS-SR remission
-                temp_test = {'length_zero':0, 'length_one': 0, "days_baseline_zero": 0, "baseline_na":0,'invalid_baseline':0}
-                i = 0
-                for id, group in scale_df.groupby(['subjectkey']):
-                    if id in over21_df['subjectkey'].values: # Only generate y if this subject stayed in study for 4 weeks             
-                        # Grab the baseline entry
-                        subset = group[(group['version_form'] == version_form) & (group['days_baseline'] <= 77)]
+#                 # Create CAN-BIND overlapping targets with QIDS-SR remission
+#                 temp_test = {'length_zero':0, 'length_one': 0, "days_baseline_zero": 0, "baseline_na":0,'invalid_baseline':0}
+#                 i = 0
+#                 for id, group in scale_df.groupby(['subjectkey']):
+#                     if id in over21_df['subjectkey'].values: # Only generate y if this subject stayed in study for 4 weeks             
+#                         # Grab the baseline entry
+#                         subset = group[(group['version_form'] == version_form) & (group['days_baseline'] <= 77)]
 
-                        # Added due to a bug where there is nan qstot at days_baseline = 0
-                        subset = subset[subset['qstot'].notna()]
+#                         # Added due to a bug where there is nan qstot at days_baseline = 0
+#                         subset = subset[subset['qstot'].notna()]
 
-                        if subset.shape[0] == 0:
-                            continue
+#                         if subset.shape[0] == 0:
+#                             continue
 
-                        sorted_subset = subset.sort_values(by=['days_baseline'], ascending=False)
+#                         sorted_subset = subset.sort_values(by=['days_baseline'], ascending=False)
                         
-                        baseline = sorted_subset.iloc[-1]['qstot']
-                        end_score = sorted_subset.iloc[0]['qstot']
-                        end_day = sorted_subset.iloc[0]['days_baseline']
+#                         baseline = sorted_subset.iloc[-1]['qstot']
+#                         end_score = sorted_subset.iloc[0]['qstot']
+#                         end_day = sorted_subset.iloc[0]['days_baseline']
 
-                        if np.isnan(baseline):
-                            temp_test['baseline_na'] += 1
+#                         if np.isnan(baseline):
+#                             temp_test['baseline_na'] += 1
 
-                        if baseline <6:
-                            temp_test['invalid_baseline'] += 1
-                            continue
+#                         if baseline <6:
+#                             temp_test['invalid_baseline'] += 1
+#                             continue
                         
-                        if end_day > 21:
-                            y_wk8_resp_qids01.loc[i, "subjectkey"] = id
+#                         if end_day > 21:
+#                             y_wk8_resp_qids01.loc[i, "subjectkey"] = id
                         
-                            # Grab the later days_baseline entries
-                            # subset = group[(group['version_form'] == version_form) ]
-                            # Added due to a bug where there is nan qstot at days_baseline = 0
-                            # subset = subset[subset['qstot'].notna()]
+#                             # Grab the later days_baseline entries
+#                             # subset = group[(group['version_form'] == version_form) ]
+#                             # Added due to a bug where there is nan qstot at days_baseline = 0
+#                             # subset = subset[subset['qstot'].notna()]
 
-                            # if subset.shape[0] == 0:
-                            #     continue
+#                             # if subset.shape[0] == 0:
+#                             #     continue
 
-                            # Validity checks
-                            if subset.shape[0] == 1:
-                                temp_test['length_one'] += 1
-                                if subset.iloc[0]['days_baseline'] == 0:
-                                    temp_test['days_baseline_zero'] += 1
-                            elif subset.shape[0] == 0:
-                                temp_test['length_zero'] += 1
+#                             # Validity checks
+#                             if subset.shape[0] == 1:
+#                                 temp_test['length_one'] += 1
+#                                 if subset.iloc[0]['days_baseline'] == 0:
+#                                     temp_test['days_baseline_zero'] += 1
+#                             elif subset.shape[0] == 0:
+#                                 temp_test['length_zero'] += 1
 
 
-                            y_wk8_resp_qids01.loc[i, "target"] = 0
-                            # for k, row in subset.iterrows():
-                            #     #If any of the depression scores at later days_baseline is half or less of baseline, then subject is TRD
-                            #     if row['qstot'] <= 0.5 * baseline:
-                            #         y_wk8_resp_qids01.loc[i, "target"] = 1
-                            #         break
+#                             y_wk8_resp_qids01.loc[i, "target"] = 0
+#                             # for k, row in subset.iterrows():
+#                             #     #If any of the depression scores at later days_baseline is half or less of baseline, then subject is TRD
+#                             #     if row['qstot'] <= 0.5 * baseline:
+#                             #         y_wk8_resp_qids01.loc[i, "target"] = 1
+#                             #         break
                             
                             
-                            if end_score <= 0.5*baseline:
+#                             if end_score <= 0.5*baseline:
                                 
-                                y_wk8_resp_qids01.loc[i, "target"] = 1
-                    i += 1
+#                                 y_wk8_resp_qids01.loc[i, "target"] = 1
+#                     i += 1
                 
-                if vers == 'c': 
-                    y_lvl2_rem_qids_c = y_lvl2_rem_qids01
-                    y_lvl2_rem_qids_tillwk4_c = y_lvl2_rem_qids01_tillwk4
-                    y_wk8_resp_qids_c = y_wk8_resp_qids01
-                    y_wk8_resp_mag_qids_c = y_wk8_resp_magnitude_qids01
+#                 if vers == 'c': 
+#                     y_lvl2_rem_qids_c = y_lvl2_rem_qids01
+#                     y_lvl2_rem_qids_tillwk4_c = y_lvl2_rem_qids01_tillwk4
+#                     y_wk8_resp_qids_c = y_wk8_resp_qids01
+#                     y_wk8_resp_mag_qids_c = y_wk8_resp_magnitude_qids01
     
-                elif vers == 'sr': 
-                    y_lvl2_rem_qids_sr = y_lvl2_rem_qids01
-                    y_wk8_resp_qids_sr = y_wk8_resp_qids01
-                    y_wk8_resp_mag_qids_sr = y_wk8_resp_magnitude_qids01
-                    print(y_wk8_resp_qids_sr.shape)
-                    print(y_wk8_resp_mag_qids_sr.shape)
-                else:
-                    Exception()
-                print(temp_test)
-            print(f"Before subsetting, shape is {y_wk8_resp_qids_sr.shape}")    
-                    
-                
-            # Create targets from both QIDS-C and QIDS-SR for week 8 remissions (qids_tot <= 5)
-            i = 0
-            for id, group in scale_df.groupby(['subjectkey']):
-                if id in over21_df['subjectkey'].values: # Only generate y if this subject stayed in study for 4 weeks             
-                    y_wk8_rem_qids_c.loc[i, "subjectkey"] = id
-                    y_wk8_rem_qids_sr.loc[i, "subjectkey"] = id
+#                 elif vers == 'sr': 
+#                     y_lvl2_rem_qids_sr = y_lvl2_rem_qids01
+#                     y_wk8_resp_qids_sr = y_wk8_resp_qids01
+#                     y_wk8_resp_mag_qids_sr = y_wk8_resp_magnitude_qids01
+#                     print(y_wk8_resp_qids_sr.shape)
+#                     print(y_wk8_resp_mag_qids_sr.shape)
+#                 else:
+#                     Exception()
+#                 print(temp_test)
+#             print(f"Before subsetting, shape is {y_wk8_resp_qids_sr.shape}")    
                     
                 
-                    # Assign 1 to all subjects who achieve remission within first 8 weeks, which is less than 77 days in their recording as sheets with weeks recorded have days baseline up to 77 given a possible long intro period
-                    subset_c = group[(group['version_form'] == "Clinician") & (group['qstot'] <= 5) & (group['days_baseline'] <= 77)]
-                    subset_sr = group[(group['version_form'] == "Self Rating") & (group['days_baseline'] <= 77)]
+#             # Create targets from both QIDS-C and QIDS-SR for week 8 remissions (qids_tot <= 5)
+#             i = 0
+#             for id, group in scale_df.groupby(['subjectkey']):
+#                 if id in over21_df['subjectkey'].values: # Only generate y if this subject stayed in study for 4 weeks             
+#                     y_wk8_rem_qids_c.loc[i, "subjectkey"] = id
+#                     y_wk8_rem_qids_sr.loc[i, "subjectkey"] = id
+                    
+                
+#                     # Assign 1 to all subjects who achieve remission within first 8 weeks, which is less than 77 days in their recording as sheets with weeks recorded have days baseline up to 77 given a possible long intro period
+#                     subset_c = group[(group['version_form'] == "Clinician") & (group['qstot'] <= 5) & (group['days_baseline'] <= 77)]
+#                     subset_sr = group[(group['version_form'] == "Self Rating") & (group['days_baseline'] <= 77)]
 
                     
-                    subset_sr = subset_sr[subset_sr['qstot'].notna()]
+#                     subset_sr = subset_sr[subset_sr['qstot'].notna()]
 
-                    if subset_sr.shape[0] == 0:
-                        continue
+#                     if subset_sr.shape[0] == 0:
+#                         continue
 
-                    sorted_subset_sr = subset_sr.sort_values(by=['days_baseline'], ascending=False)
+#                     sorted_subset_sr = subset_sr.sort_values(by=['days_baseline'], ascending=False)
 
-                    sr_end_score = sorted_subset_sr.iloc[0]['qstot']
-                    sr_baseline = sorted_subset_sr.iloc[-1]['qstot']
-                    sr_end_day = sorted_subset_sr.iloc[0]['days_baseline']
+#                     sr_end_score = sorted_subset_sr.iloc[0]['qstot']
+#                     sr_baseline = sorted_subset_sr.iloc[-1]['qstot']
+#                     sr_end_day = sorted_subset_sr.iloc[0]['days_baseline']
                     
 
-                    if sr_baseline < 6:
-                        ValueError('woh there was a baseline value less than 5!')
-                        continue
+#                     if sr_baseline < 6:
+#                         ValueError('woh there was a baseline value less than 5!')
+#                         continue
 
 
-                    if subset_c.shape[0] > 0:
-                        y_wk8_rem_qids_c.loc[i, "target"] = 1
-                    else:
-                        y_wk8_rem_qids_c.loc[i, "target"] = 0
+#                     if subset_c.shape[0] > 0:
+#                         y_wk8_rem_qids_c.loc[i, "target"] = 1
+#                     else:
+#                         y_wk8_rem_qids_c.loc[i, "target"] = 0
 
-                    if sr_end_day >21:    
-                        if sr_end_score <= 5:
-                            y_wk8_rem_qids_sr.loc[i, "target"] = 1
-                        else:
-                            y_wk8_rem_qids_sr.loc[i, "target"] = 0
+#                     if sr_end_day >21:    
+#                         if sr_end_score <= 5:
+#                             y_wk8_rem_qids_sr.loc[i, "target"] = 1
+#                         else:
+#                             y_wk8_rem_qids_sr.loc[i, "target"] = 0
 
-                    i += 1
-            print(y_wk8_rem_qids_sr.shape)
-    y_lvl2_rem_qids_c.to_csv(output_y_dir_path + "y_lvl2_rem_qids_c" + CSV_SUFFIX, index=False)
-    y_lvl2_rem_qids_sr.to_csv(output_y_dir_path + "y_lvl2_rem_qids_sr" + CSV_SUFFIX, index=False)
+#                     i += 1
+#             print(y_wk8_rem_qids_sr.shape)
+#     y_lvl2_rem_qids_c.to_csv(output_y_dir_path + "y_lvl2_rem_qids_c" + CSV_SUFFIX, index=False)
+#     y_lvl2_rem_qids_sr.to_csv(output_y_dir_path + "y_lvl2_rem_qids_sr" + CSV_SUFFIX, index=False)
 
-    y_lvl2_rem_qids_tillwk4_c.to_csv(output_y_dir_path + "y_lvl2_rem_qids_tillwk4_c" + CSV_SUFFIX, index=False)
+#     y_lvl2_rem_qids_tillwk4_c.to_csv(output_y_dir_path + "y_lvl2_rem_qids_tillwk4_c" + CSV_SUFFIX, index=False)
     
-    y_wk8_resp_qids_c.to_csv(output_y_dir_path + "y_wk8_resp_qids_c" + CSV_SUFFIX, index=False)
-    y_wk8_resp_qids_sr.to_csv(output_y_dir_path + "y_wk8_resp_qids_sr" + CSV_SUFFIX, index=False)
+#     y_wk8_resp_qids_c.to_csv(output_y_dir_path + "y_wk8_resp_qids_c" + CSV_SUFFIX, index=False)
+#     y_wk8_resp_qids_sr.to_csv(output_y_dir_path + "y_wk8_resp_qids_sr" + CSV_SUFFIX, index=False)
     
-    y_wk8_rem_qids_c.to_csv(output_y_dir_path + "y_wk8_rem_qids_c" + CSV_SUFFIX, index=False)
-    y_wk8_rem_qids_sr.to_csv(output_y_dir_path + "y_wk8_rem_qids_sr" + CSV_SUFFIX, index=False)
+#     y_wk8_rem_qids_c.to_csv(output_y_dir_path + "y_wk8_rem_qids_c" + CSV_SUFFIX, index=False)
+#     y_wk8_rem_qids_sr.to_csv(output_y_dir_path + "y_wk8_rem_qids_sr" + CSV_SUFFIX, index=False)
 
-    #Output Magnitude respones y_files
-    y_wk8_resp_mag_qids_c.to_csv(output_y_dir_path + "y_wk8_resp_mag_qids_c" + CSV_SUFFIX, index = False)
-    y_wk8_resp_mag_qids_sr.to_csv(output_y_dir_path + "y_wk8_resp_mag_qids_sr" + CSV_SUFFIX, index = False)
+#     #Output Magnitude respones y_files
+#     y_wk8_resp_mag_qids_c.to_csv(output_y_dir_path + "y_wk8_resp_mag_qids_c" + CSV_SUFFIX, index = False)
+#     y_wk8_resp_mag_qids_sr.to_csv(output_y_dir_path + "y_wk8_resp_mag_qids_sr" + CSV_SUFFIX, index = False)
 
-    print("Y output files have  been written to:", output_y_dir_path)
+#     print("Y output files have  been written to:", output_y_dir_path)
 
 def check_qlesq_criteria(df):
     group_df = df.groupby('subjectkey')
@@ -1235,28 +1235,28 @@ def select_subjects(root_data_dir_path):
 
     ### Handle the TRD stuff
     
-    y_lvl2_rem_qids_c = pd.read_csv(input_y_generation_dir_path + "/y_lvl2_rem_qids_c" + CSV_SUFFIX)
-    y_lvl2_rem_qids_sr = pd.read_csv(input_y_generation_dir_path + "/y_lvl2_rem_qids_sr" + CSV_SUFFIX)
+    # y_lvl2_rem_qids_c = pd.read_csv(input_y_generation_dir_path + "/y_lvl2_rem_qids_c" + CSV_SUFFIX)
+    # y_lvl2_rem_qids_sr = pd.read_csv(input_y_generation_dir_path + "/y_lvl2_rem_qids_sr" + CSV_SUFFIX)
 
-    y_lvl2_rem_qids_tillwk4_c = pd.read_csv(input_y_generation_dir_path + "/y_lvl2_rem_qids_tillwk4_c" + CSV_SUFFIX)
+    # y_lvl2_rem_qids_tillwk4_c = pd.read_csv(input_y_generation_dir_path + "/y_lvl2_rem_qids_tillwk4_c" + CSV_SUFFIX)
     
-    X_nolvl1drop_qids_c__final = handle_subject_selection_conditions(input_row_selected_dir_path, X_nolvl1drop_qids_c, y_lvl2_rem_qids_c, 'c')
-    X_nolvl1drop_qids_sr__final = handle_subject_selection_conditions(input_row_selected_dir_path, X_nolvl1drop_qids_sr, y_lvl2_rem_qids_sr, 'sr')
+    # X_nolvl1drop_qids_c__final = handle_subject_selection_conditions(input_row_selected_dir_path, X_nolvl1drop_qids_c,  , 'c')
+    # X_nolvl1drop_qids_sr__final = handle_subject_selection_conditions(input_row_selected_dir_path, X_nolvl1drop_qids_sr, y_lvl2_rem_qids_sr, 'sr')
 
 
 
     # Subset the y matrices so that it matches the X matrices
-    y_lvl2_rem_qids_c__final = y_lvl2_rem_qids_c[y_lvl2_rem_qids_c.subjectkey.isin(X_nolvl1drop_qids_c__final.subjectkey)]
-    y_lvl2_rem_qids_sr__final = y_lvl2_rem_qids_sr[y_lvl2_rem_qids_sr.subjectkey.isin(X_nolvl1drop_qids_sr__final.subjectkey)]
+    # y_lvl2_rem_qids_c__final = y_lvl2_rem_qids_c[y_lvl2_rem_qids_c.subjectkey.isin(X_nolvl1drop_qids_c__final.subjectkey)]
+    # y_lvl2_rem_qids_sr__final = y_lvl2_rem_qids_sr[y_lvl2_rem_qids_sr.subjectkey.isin(X_nolvl1drop_qids_sr__final.subjectkey)]
 
     
     # Handle the week8 response stuff
-    y_wk8_resp_qids_c = pd.read_csv(input_y_generation_dir_path + "/y_wk8_resp_qids_c" + CSV_SUFFIX)
-    y_wk8_resp_qids_sr = pd.read_csv(input_y_generation_dir_path + "/y_wk8_resp_qids_sr" + CSV_SUFFIX)
+    # y_wk8_resp_qids_c = pd.read_csv(input_y_generation_dir_path + "/y_wk8_resp_qids_c" + CSV_SUFFIX)
+    # y_wk8_resp_qids_sr = pd.read_csv(input_y_generation_dir_path + "/y_wk8_resp_qids_sr" + CSV_SUFFIX)
 
     # Handle the week8 response magnitude stuff
-    y_wk8_resp_mag_qids_c = pd.read_csv(input_y_generation_dir_path + "/y_wk8_resp_mag_qids_c" + CSV_SUFFIX)
-    y_wk8_resp_mag_qids_sr= pd.read_csv(input_y_generation_dir_path + "/y_wk8_resp_mag_qids_sr" + CSV_SUFFIX)
+    # y_wk8_resp_mag_qids_c = pd.read_csv(input_y_generation_dir_path + "/y_wk8_resp_mag_qids_c" + CSV_SUFFIX)
+    # y_wk8_resp_mag_qids_sr= pd.read_csv(input_y_generation_dir_path + "/y_wk8_resp_mag_qids_sr" + CSV_SUFFIX)
 
     # Handle the qlesq stuff
     y_qlesq_77 = pd.read_csv(input_y_generation_dir_path + "/y_qlesq_77" + CSV_SUFFIX)
@@ -1264,84 +1264,91 @@ def select_subjects(root_data_dir_path):
 
 
     # Handle the week8 remission stuff
-    y_wk8_rem_qids_c = pd.read_csv(input_y_generation_dir_path + "/y_wk8_rem_qids_c" + CSV_SUFFIX)
-    y_wk8_rem_qids_sr = pd.read_csv(input_y_generation_dir_path + "/y_wk8_rem_qids_sr" + CSV_SUFFIX)    
+    # y_wk8_rem_qids_c = pd.read_csv(input_y_generation_dir_path + "/y_wk8_rem_qids_c" + CSV_SUFFIX)
+    # y_wk8_rem_qids_sr = pd.read_csv(input_y_generation_dir_path + "/y_wk8_rem_qids_sr" + CSV_SUFFIX)    
 
     # Handle the X matrices of subjects who stayed until week 4
     # These use one of the y's, but it doesn't matter as only uses for subject selection which is same between those y matrices
-    X_tillwk4_qids_c__final = handle_subject_selection_conditions(input_row_selected_dir_path, X_tillwk4_qids_c, y_wk8_rem_qids_c, 'c')
-    X_tillwk4_qids_sr__final = handle_subject_selection_conditions(input_row_selected_dir_path, X_tillwk4_qids_sr, y_wk8_rem_qids_sr, 'sr')    
+    # X_tillwk4_qids_c__final = handle_subject_selection_conditions(input_row_selected_dir_path, X_tillwk4_qids_c, y_wk8_rem_qids_c, 'c')
+    # X_tillwk4_qids_sr__final = handle_subject_selection_conditions(input_row_selected_dir_path, X_tillwk4_qids_sr, y_wk8_rem_qids_sr, 'sr')  
 
+    ##test  
+    X_77_qlesq_sr__final = handle_subject_selection_conditions(input_row_selected_dir_path, X_tillwk4_qids_sr, y_qlesq_77, 'sr') 
+    X_91_qlesq_sr__final = handle_subject_selection_conditions(input_row_selected_dir_path, X_tillwk4_qids_sr, y_qlesq_91, 'sr') 
     
     # Subset the y matrices so that they matches the X matrices
-    y_wk8_resp_qids_c__final = y_wk8_resp_qids_c[y_wk8_resp_qids_c.subjectkey.isin(X_tillwk4_qids_c__final.subjectkey)]
-    y_wk8_resp_qids_sr__final = y_wk8_resp_qids_sr[y_wk8_resp_qids_sr.subjectkey.isin(X_tillwk4_qids_sr__final.subjectkey)]
-    print(f"after subsetting, size is {y_wk8_resp_qids_sr__final.shape}")
+    # y_wk8_resp_qids_c__final = y_wk8_resp_qids_c[y_wk8_resp_qids_c.subjectkey.isin(X_tillwk4_qids_c__final.subjectkey)]
+    # y_wk8_resp_qids_sr__final = y_wk8_resp_qids_sr[y_wk8_resp_qids_sr.subjectkey.isin(X_tillwk4_qids_sr__final.subjectkey)]
+    # print(f"after subsetting, size is {y_wk8_resp_qids_sr__final.shape}")
 
-    y_wk8_rem_qids_c__final = y_wk8_rem_qids_c[y_wk8_rem_qids_c.subjectkey.isin(X_tillwk4_qids_c__final.subjectkey)]
-    y_wk8_rem_qids_sr__final = y_wk8_rem_qids_sr[y_wk8_rem_qids_sr.subjectkey.isin(X_tillwk4_qids_sr__final.subjectkey)]
+    # y_wk8_rem_qids_c__final = y_wk8_rem_qids_c[y_wk8_rem_qids_c.subjectkey.isin(X_tillwk4_qids_c__final.subjectkey)]
+    # y_wk8_rem_qids_sr__final = y_wk8_rem_qids_sr[y_wk8_rem_qids_sr.subjectkey.isin(X_tillwk4_qids_sr__final.subjectkey)]
 
     # Subset y magnitude matrices so that they match X matrices
-    y_wk8_resp_mag_qids_c__final = y_wk8_resp_mag_qids_c[y_wk8_resp_mag_qids_c.subjectkey.isin(X_tillwk4_qids_c__final.subjectkey)]
-    y_wk8_resp_mag_qids_sr__final = y_wk8_resp_mag_qids_sr[y_wk8_resp_mag_qids_sr.subjectkey.isin(X_tillwk4_qids_sr__final.subjectkey)]
+    # y_wk8_resp_mag_qids_c__final = y_wk8_resp_mag_qids_c[y_wk8_resp_mag_qids_c.subjectkey.isin(X_tillwk4_qids_c__final.subjectkey)]
+    # y_wk8_resp_mag_qids_sr__final = y_wk8_resp_mag_qids_sr[y_wk8_resp_mag_qids_sr.subjectkey.isin(X_tillwk4_qids_sr__final.subjectkey)]
 
     # Subset qlesq y with X-sr dataset
     y_qlesq_77__final = y_qlesq_77[y_qlesq_77.subjectkey.isin(X_tillwk4_qids_sr.subjectkey)]
     y_qlesq_91__final = y_qlesq_91[y_qlesq_91.subjectkey.isin(X_tillwk4_qids_sr.subjectkey)]
 
     # Also do a form of the lvl 2 remission (TRD) to match the week 4 inclusion criteria
-    y_lvl2_rem_qids_c_tillwk4__final = y_lvl2_rem_qids_tillwk4_c[y_lvl2_rem_qids_tillwk4_c.subjectkey.isin(X_tillwk4_qids_c__final.subjectkey)]
+    # y_lvl2_rem_qids_c_tillwk4__final = y_lvl2_rem_qids_tillwk4_c[y_lvl2_rem_qids_tillwk4_c.subjectkey.isin(X_tillwk4_qids_c__final.subjectkey)]
 
     # Sort both X and y matrices by 'subject' to make sure they match; y should already be sorted by this
-    X_nolvl1drop_qids_c__final = X_nolvl1drop_qids_c__final.sort_values(by=['subjectkey'])
-    X_nolvl1drop_qids_sr__final = X_nolvl1drop_qids_sr__final.sort_values(by=['subjectkey'])
-    X_tillwk4_qids_c__final = X_tillwk4_qids_c__final.sort_values(by=['subjectkey'])
-    X_tillwk4_qids_sr__final = X_tillwk4_qids_sr__final.sort_values(by=['subjectkey'])
+    # X_nolvl1drop_qids_c__final = X_nolvl1drop_qids_c__final.sort_values(by=['subjectkey'])
+    # X_nolvl1drop_qids_sr__final = X_nolvl1drop_qids_sr__final.sort_values(by=['subjectkey'])
+    # X_tillwk4_qids_c__final = X_tillwk4_qids_c__final.sort_values(by=['subjectkey'])
+    # X_tillwk4_qids_sr__final = X_tillwk4_qids_sr__final.sort_values(by=['subjectkey'])
+    X_77_qlesq_sr__final = X_77_qlesq_sr__final.sort_values(by=['subjectkey'])
+    X_91_qlesq_sr__final = X_91_qlesq_sr__final.sort_values(by=['subjectkey'])
     
-    y_lvl2_rem_qids_c__final = y_lvl2_rem_qids_c__final.sort_values(by=['subjectkey'])
-    y_lvl2_rem_qids_sr__final = y_lvl2_rem_qids_sr__final.sort_values(by=['subjectkey'])    
-    y_wk8_resp_qids_c__final = y_wk8_resp_qids_c__final.sort_values(by=['subjectkey'])
-    y_wk8_resp_qids_sr__final = y_wk8_resp_qids_sr__final.sort_values(by=['subjectkey'])
-    y_wk8_resp_mag_qids_c__final = y_wk8_resp_mag_qids_c__final.sort_values(by=['subjectkey'])
-    y_wk8_resp_mag_qids_sr__final = y_wk8_resp_mag_qids_sr__final.sort_values(by=['subjectkey'])
-    y_wk8_rem_qids_c__final = y_wk8_rem_qids_c__final.sort_values(by=['subjectkey'])
-    y_wk8_rem_qids_sr__final = y_wk8_rem_qids_sr__final.sort_values(by=['subjectkey'])
+    # y_lvl2_rem_qids_c__final = y_lvl2_rem_qids_c__final.sort_values(by=['subjectkey'])
+    # y_lvl2_rem_qids_sr__final = y_lvl2_rem_qids_sr__final.sort_values(by=['subjectkey'])    
+    # y_wk8_resp_qids_c__final = y_wk8_resp_qids_c__final.sort_values(by=['subjectkey'])
+    # y_wk8_resp_qids_sr__final = y_wk8_resp_qids_sr__final.sort_values(by=['subjectkey'])
+    # y_wk8_resp_mag_qids_c__final = y_wk8_resp_mag_qids_c__final.sort_values(by=['subjectkey'])
+    # y_wk8_resp_mag_qids_sr__final = y_wk8_resp_mag_qids_sr__final.sort_values(by=['subjectkey'])
+    # y_wk8_rem_qids_c__final = y_wk8_rem_qids_c__final.sort_values(by=['subjectkey'])
+    # y_wk8_rem_qids_sr__final = y_wk8_rem_qids_sr__final.sort_values(by=['subjectkey'])
 
     # Sorting qlesq
     y_qlesq_77__final = y_qlesq_77__final.sort_values(by = ['subjectkey'])
     y_qlesq_91__final = y_qlesq_91__final.sort_values(by = ['subjectkey'])
     
-    y_lvl2_rem_qids_c_tillwk4__final = y_lvl2_rem_qids_c_tillwk4__final.sort_values(by=['subjectkey'])
+    # y_lvl2_rem_qids_c_tillwk4__final = y_lvl2_rem_qids_c_tillwk4__final.sort_values(by=['subjectkey'])
     
     # Make two new y matrices to evaluate performance if a different inclusion is used
-    y_wk8_resp_qids_sr_nolvl1drop = y_wk8_resp_qids_sr__final[y_wk8_resp_qids_sr__final.subjectkey.isin(X_nolvl1drop_qids_sr__final.subjectkey)]
-    y_wk8_resp_qids_c_nolvl1drop = y_wk8_resp_qids_c__final[y_wk8_resp_qids_c__final.subjectkey.isin(X_nolvl1drop_qids_c__final.subjectkey)]
+    # y_wk8_resp_qids_sr_nolvl1drop = y_wk8_resp_qids_sr__final[y_wk8_resp_qids_sr__final.subjectkey.isin(X_nolvl1drop_qids_sr__final.subjectkey)]
+    # y_wk8_resp_qids_c_nolvl1drop = y_wk8_resp_qids_c__final[y_wk8_resp_qids_c__final.subjectkey.isin(X_nolvl1drop_qids_c__final.subjectkey)]
     
-    y_wk8_resp_mag_qids_sr_nolvl1drop = y_wk8_resp_mag_qids_sr__final[y_wk8_resp_mag_qids_sr__final.subjectkey.isin(X_nolvl1drop_qids_sr__final.subjectkey)]
-    y_wk8_resp_mag_qids_c_nolvl1drop = y_wk8_resp_mag_qids_c__final[y_wk8_resp_mag_qids_c__final.subjectkey.isin(X_nolvl1drop_qids_c__final.subjectkey)]
+    # y_wk8_resp_mag_qids_sr_nolvl1drop = y_wk8_resp_mag_qids_sr__final[y_wk8_resp_mag_qids_sr__final.subjectkey.isin(X_nolvl1drop_qids_sr__final.subjectkey)]
+    # y_wk8_resp_mag_qids_c_nolvl1drop = y_wk8_resp_mag_qids_c__final[y_wk8_resp_mag_qids_c__final.subjectkey.isin(X_nolvl1drop_qids_c__final.subjectkey)]
 
     # Output X matrices to CSV
-    X_nolvl1drop_qids_c__final.to_csv(output_subject_selected_path + "X_nolvl1drop_qids_c__final" + CSV_SUFFIX, index=False)
-    X_nolvl1drop_qids_sr__final.to_csv(output_subject_selected_path + "X_nolvl1drop_qids_sr__final" + CSV_SUFFIX, index=False)
-    X_tillwk4_qids_c__final.to_csv(output_subject_selected_path + "X_tillwk4_qids_c__final" + CSV_SUFFIX, index=False)
-    X_tillwk4_qids_sr__final.to_csv(output_subject_selected_path + "X_tillwk4_qids_sr__final" + CSV_SUFFIX, index=False)
+    # X_nolvl1drop_qids_c__final.to_csv(output_subject_selected_path + "X_nolvl1drop_qids_c__final" + CSV_SUFFIX, index=False)
+    # X_nolvl1drop_qids_sr__final.to_csv(output_subject_selected_path + "X_nolvl1drop_qids_sr__final" + CSV_SUFFIX, index=False)
+    # X_tillwk4_qids_c__final.to_csv(output_subject_selected_path + "X_tillwk4_qids_c__final" + CSV_SUFFIX, index=False)
+    # X_tillwk4_qids_sr__final.to_csv(output_subject_selected_path + "X_tillwk4_qids_sr__final" + CSV_SUFFIX, index=False)
+    X_77_qlesq_sr__final.to_csv(output_subject_selected_path + "X_77_qlesq_sr__final" + CSV_SUFFIX, index=False)
+    X_91_qlesq_sr__final.to_csv(output_subject_selected_path + "X_91_qlesq_sr__final" + CSV_SUFFIX, index=False)
 
     # Output y matrices to CSV
-    y_lvl2_rem_qids_c__final.to_csv(output_subject_selected_path + "y_lvl2_rem_qids_c__final" + CSV_SUFFIX, index=False)
-    y_lvl2_rem_qids_sr__final.to_csv(output_subject_selected_path + "y_lvl2_rem_qids_sr__final" + CSV_SUFFIX, index=False)
-    y_wk8_resp_qids_c__final.to_csv(output_subject_selected_path + "y_wk8_resp_qids_c__final" + CSV_SUFFIX, index=False)
-    y_wk8_resp_qids_sr__final.to_csv(output_subject_selected_path + "y_wk8_resp_qids_sr__final" + CSV_SUFFIX, index=False)
-    y_wk8_resp_mag_qids_c__final.to_csv(output_subject_selected_path + "y_wk8_resp_mag_qids_c__final" + CSV_SUFFIX, index=False)
-    y_wk8_resp_mag_qids_sr__final.to_csv(output_subject_selected_path + "y_wk8_resp_mag_qids_sr__final" + CSV_SUFFIX, index=False)
-    y_wk8_rem_qids_c__final.to_csv(output_subject_selected_path + "y_wk8_rem_qids_c__final" + CSV_SUFFIX, index=False)
-    y_wk8_rem_qids_sr__final.to_csv(output_subject_selected_path + "y_wk8_rem_qids_sr__final" + CSV_SUFFIX, index=False)
+    # y_lvl2_rem_qids_c__final.to_csv(output_subject_selected_path + "y_lvl2_rem_qids_c__final" + CSV_SUFFIX, index=False)
+    # y_lvl2_rem_qids_sr__final.to_csv(output_subject_selected_path + "y_lvl2_rem_qids_sr__final" + CSV_SUFFIX, index=False)
+    # y_wk8_resp_qids_c__final.to_csv(output_subject_selected_path + "y_wk8_resp_qids_c__final" + CSV_SUFFIX, index=False)
+    # y_wk8_resp_qids_sr__final.to_csv(output_subject_selected_path + "y_wk8_resp_qids_sr__final" + CSV_SUFFIX, index=False)
+    # y_wk8_resp_mag_qids_c__final.to_csv(output_subject_selected_path + "y_wk8_resp_mag_qids_c__final" + CSV_SUFFIX, index=False)
+    # y_wk8_resp_mag_qids_sr__final.to_csv(output_subject_selected_path + "y_wk8_resp_mag_qids_sr__final" + CSV_SUFFIX, index=False)
+    # y_wk8_rem_qids_c__final.to_csv(output_subject_selected_path + "y_wk8_rem_qids_c__final" + CSV_SUFFIX, index=False)
+    # y_wk8_rem_qids_sr__final.to_csv(output_subject_selected_path + "y_wk8_rem_qids_sr__final" + CSV_SUFFIX, index=False)
 
-    y_lvl2_rem_qids_c_tillwk4__final.to_csv(output_subject_selected_path + "y_lvl2_rem_qids_c_tillwk4__final" + CSV_SUFFIX, index=False)
+    # y_lvl2_rem_qids_c_tillwk4__final.to_csv(output_subject_selected_path + "y_lvl2_rem_qids_c_tillwk4__final" + CSV_SUFFIX, index=False)
     
-    y_wk8_resp_qids_sr_nolvl1drop.to_csv(output_subject_selected_path + "y_wk8_resp_qids_sr_nolvl1drop" + CSV_SUFFIX, index=False)
-    y_wk8_resp_qids_c_nolvl1drop.to_csv(output_subject_selected_path + "y_wk8_resp_qids_c_nolvl1drop" + CSV_SUFFIX, index=False)
-    y_wk8_resp_mag_qids_sr_nolvl1drop.to_csv(output_subject_selected_path + "y_wk8_resp_mag_qids_sr_nolvl1drop" + CSV_SUFFIX, index=False)
-    y_wk8_resp_mag_qids_c_nolvl1drop.to_csv(output_subject_selected_path + "y_wk8_resp_mag_qids_c_nolvl1drop" + CSV_SUFFIX, index=False)
+    # y_wk8_resp_qids_sr_nolvl1drop.to_csv(output_subject_selected_path + "y_wk8_resp_qids_sr_nolvl1drop" + CSV_SUFFIX, index=False)
+    # y_wk8_resp_qids_c_nolvl1drop.to_csv(output_subject_selected_path + "y_wk8_resp_qids_c_nolvl1drop" + CSV_SUFFIX, index=False)
+    # y_wk8_resp_mag_qids_sr_nolvl1drop.to_csv(output_subject_selected_path + "y_wk8_resp_mag_qids_sr_nolvl1drop" + CSV_SUFFIX, index=False)
+    # y_wk8_resp_mag_qids_c_nolvl1drop.to_csv(output_subject_selected_path + "y_wk8_resp_mag_qids_c_nolvl1drop" + CSV_SUFFIX, index=False)
 
     y_qlesq_77__final.to_csv(output_subject_selected_path + "y_qlesq_77__final" + CSV_SUFFIX, index=False)
     y_qlesq_91__final.to_csv(output_subject_selected_path + "y_qlesq_91__final" + CSV_SUFFIX, index=False)
@@ -1355,13 +1362,13 @@ def handle_subject_selection_conditions(input_row_selected_dir_path, X, y_df, qi
     y = y_df.dropna(axis='rows') # Drop subjects lacking a y value
     X = X[X["subjectkey"].isin(y["subjectkey"])]
     
-    # Select subjects that have ucq entries, aka eliminate subjects that don't have ucq entries, as a proxy for the small amount of subjects missing most patients. 
-    file_ucq = pd.read_csv(input_row_selected_dir_path + "/rs__ucq01" + CSV_SUFFIX)
-    X = X[X["subjectkey"].isin(file_ucq["subjectkey"])]
+    # # Select subjects that have ucq entries, aka eliminate subjects that don't have ucq entries, as a proxy for the small amount of subjects missing most patients. 
+    # file_ucq = pd.read_csv(input_row_selected_dir_path + "/rs__ucq01" + CSV_SUFFIX)
+    # X = X[X["subjectkey"].isin(file_ucq["subjectkey"])]
     
-    # Eliminate subjects that don't have week0 QIDS entries from either QIDS-C or QIDS-SR
-    file_qids01_w0c = pd.read_csv(input_row_selected_dir_path + "/rs__qids01_w0" + qids_version + CSV_SUFFIX)
-    X = X[X["subjectkey"].isin(file_qids01_w0c["subjectkey"])]
+    # # Eliminate subjects that don't have week0 QIDS entries from either QIDS-C or QIDS-SR
+    # file_qids01_w0c = pd.read_csv(input_row_selected_dir_path + "/rs__qids01_w0" + qids_version + CSV_SUFFIX)
+    # X = X[X["subjectkey"].isin(file_qids01_w0c["subjectkey"])]
 
     return X
 
@@ -1412,7 +1419,7 @@ if __name__ == "__main__":
         convert_values(data_dir_path)
         aggregate_rows(data_dir_path)
         impute(data_dir_path)
-        generate_y(data_dir_path)
+        # generate_y(data_dir_path)
         generate_qlesq_y(data_dir_path, "y_qlesq_77", days_baseline_cutoff = 77)
         generate_qlesq_y(data_dir_path, "y_qlesq_91", days_baseline_cutoff = 91)
         select_subjects(data_dir_path)

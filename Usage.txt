@@ -29,3 +29,7 @@ python code/create_targets.py data/STARD_raw/processed_data/final_xy_data_matric
 
 python code/create_targets.py data/canbind_raw_data/q-les-q/canbind_qlesq_y
 
+Move Relevant Datasets to modelling folder:
+python code/move_modelling.py
+
+
