@@ -33,8 +33,18 @@ class subject_selector():
         self.df = self.df.drop(self.df[self.df['level'] == lvl].index)
         print(self.df.shape)
         
-    def filter_inappropriate_calltype(self, lvl, calltype = ['Entry', 'Base']):
-        self.df = self.df.drop(self.df[(self.df['level'] == lvl) & (~self.df['CallType'].isin(calltype))].index)
+    def filter_inappropriate_level_2(self):
+        
+        bad_ids = []
+        grouped_df = self.df.groupby('subjectkey')
+        
+        for id, data in grouped_df:
+            for row, col in data.iterrows():
+    
+                if data[(data['days_baseline'] < 21) & (data['level'] == 'Level 2')].shape[0] > 0:
+                    bad_ids.append(id)
+                   
+        self.df = self.df[~self.df['subjectkey'].isin(bad_ids)]
         print(self.df.shape)
         
     def get_relevant_ids(self):

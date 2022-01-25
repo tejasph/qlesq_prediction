@@ -1118,6 +1118,9 @@ def generate_qlesq_y(root_data_dir_path, output_name,  days_baseline_cutoff = 77
     print(f"Original shape: {qlesq.shape}")
     selector = subject_selector(qlesq)
 
+    # Exclude people who switched to level 2 (most likely d/t to adverse effects)
+    selector.filter_inappropriate_level_2()
+
     # Only consider rows that fall below the days baseline cutoff (default is 8 weeks or 77 days)
     selector.filter_time_window(max_cutoff = days_baseline_cutoff)
 
@@ -1165,6 +1168,11 @@ def generate_qlesq_y(root_data_dir_path, output_name,  days_baseline_cutoff = 77
 
         # If there are multiple Follow Up entries, only retain the first one
         sorted_data = sorted_data[~(sorted_data.duplicated(['level']) & sorted_data.level.eq('Follow up'))]
+
+        # In the case where there are both level 2 and Follow up within the window of 21-77, only use first Level 2 value (pretty rare)
+        if "Level 2" in sorted_data.level.values:
+            sorted_data = sorted_data[sorted_data['level'] != 'Follow up'] # this protects us from using a follow up value for someone who has been in level 2 for some time
+
         
         if data.shape[0] <= 1:
             continue
@@ -1367,8 +1375,8 @@ def handle_subject_selection_conditions(input_row_selected_dir_path, X, y_df, qi
     X = X[X["subjectkey"].isin(file_ucq["subjectkey"])]
     
     # Eliminate subjects that don't have week0 QIDS entries from either QIDS-C or QIDS-SR
-    file_qids01_w0c = pd.read_csv(input_row_selected_dir_path + "/rs__qids01_w0" + qids_version + CSV_SUFFIX)
-    X = X[X["subjectkey"].isin(file_qids01_w0c["subjectkey"])]
+    # file_qids01_w0c = pd.read_csv(input_row_selected_dir_path + "/rs__qids01_w0" + qids_version + CSV_SUFFIX)
+    # X = X[X["subjectkey"].isin(file_qids01_w0c["subjectkey"])]
 
     return X
 
