@@ -18,6 +18,7 @@ def main():
     # Move STAR*D data
     shutil.move("data/STARD_raw/processed_data/final_xy_data_matrices/y_qlesq_77__final__targets.csv", "data/modelling/y_qlesq_77__final__targets.csv")
     shutil.move("data/STARD_raw/processed_data/final_xy_data_matrices/y_qlesq_91__final__targets.csv", "data/modelling/y_qlesq_91__final__targets.csv")
+    
     shutil.move("data/STARD_raw/processed_data/final_xy_data_matrices/X_77_qlesq_sr__final.csv", "data/modelling/X_77_qlesq_sr__final.csv")
     shutil.move("data/STARD_raw/processed_data/final_xy_data_matrices/X_91_qlesq_sr__final.csv", "data/modelling/X_91_qlesq_sr__final.csv")
     shutil.move("data/STARD_raw/processed_data/final_xy_data_matrices/X_77_qlesq_sr__final_extval.csv", "data/modelling/X_77_qlesq_sr__final_extval.csv")
