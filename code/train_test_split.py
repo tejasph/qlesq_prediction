@@ -1,27 +1,51 @@
 #train_test_split
 
-import pandas 
-import argparse
+import pandas as pd
+import typer
+import datetime
+from globals import DATA_MODELLING_FOLDER
+from sklearn.model_selection import train_test_split
 import os
 
 
 
-def main(x_path, y_path):
-    print(x_path)
-    print(y_path)
+def main(x_data: str, y_data: str , y_type: str = 'qlesq_resp'):
+    startTime = datetime.datetime.now()
+    typer.echo(x_data)
+    typer.echo(y_data)
+
+    X_path = os.path.join(DATA_MODELLING_FOLDER, x_data)
+    y_path = os.path.join(DATA_MODELLING_FOLDER, y_data)
+
+    X = pd.read_csv(X_path).set_index('subjectkey')
+    y = pd.read_csv(y_path).set_index('subjectkey')
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y[[y_type]], stratify = y[[y_type]], test_size=0.20, random_state = 92)
+
+    print(X_train.shape)
+    print(X_test.shape)
+    print(y_train.shape)
+    print(y_test.shape)
+    
+    print(y_train.value_counts())
+    print(y_test.value_counts())
+
+    if "77" in x_data:
+        name_addon = "77"
+        print(77)
+    elif "91" in x_data:
+        name_addon = "91"
+        print(91)
+
+    X_train.to_csv(DATA_MODELLING_FOLDER + "/X_train_"+ name_addon + "_overlapping.csv", index = True)
+    y_train.to_csv(DATA_MODELLING_FOLDER + "/y_train_" + name_addon + ".csv", index = True)
+    X_test.to_csv(DATA_MODELLING_FOLDER + "/X_test_"+ name_addon+ "_overlapping.csv", index = True)
+    y_test.to_csv(DATA_MODELLING_FOLDER + "/y_test_" + name_addon + ".csv", index = True)
+
+
+    print(f"Completed in: {datetime.datetime.now() - startTime}")
+
+
 
 if __name__ == "__main__":
-    my_parser = argparse.ArgumentParser(description='List the content of a folder')
-
-    # Add the arguments
-    my_parser.add_argument('X_path',
-        default = os.path.join(r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\data\modelling", 'X_77_qlesq_sr__final_extval'),
-        help='the path to X')
-
-    # Add the arguments
-    my_parser.add_argument('Y_path',
-        default = os.path.join(r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\data\modelling", 'y_77_qlesq_sr__final__targets'),
-        help='the path to y')
-
-    args = my_parser.parse_args()
-    main(args.X_path, args.Y_path)
+    typer.run(main)
