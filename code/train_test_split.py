@@ -9,7 +9,7 @@ import os
 
 
 
-def main(x_data: str, y_data: str , y_type: str = 'qlesq_resp'):
+def main(x_data: str, y_data: str , y_type: str = 'qlesq_QoL_threshold'):
     startTime = datetime.datetime.now()
     typer.echo(x_data)
     typer.echo(y_data)
@@ -31,15 +31,20 @@ def main(x_data: str, y_data: str , y_type: str = 'qlesq_resp'):
     print(y_test.value_counts())
 
     if "77" in x_data:
-        name_addon = "77"
-        print(77)
+        if "extval" in x_data:
+            name_addon = "77_over"
+        else:
+            name_addon = "77"
     elif "91" in x_data:
-        name_addon = "91"
-        print(91)
+        if "extval" in x_data:
+            name_addon = "91_over"
+        else:
+            name_addon = "91"
 
-    X_train.to_csv(DATA_MODELLING_FOLDER + "/X_train_"+ name_addon + "_overlapping.csv", index = True)
+
+    X_train.to_csv(DATA_MODELLING_FOLDER + "/X_train_"+ name_addon +".csv" , index = True)
     y_train.to_csv(DATA_MODELLING_FOLDER + "/y_train_" + name_addon + ".csv", index = True)
-    X_test.to_csv(DATA_MODELLING_FOLDER + "/X_test_"+ name_addon+ "_overlapping.csv", index = True)
+    X_test.to_csv(DATA_MODELLING_FOLDER + "/X_test_"+ name_addon + ".csv", index = True)
     y_test.to_csv(DATA_MODELLING_FOLDER + "/y_test_" + name_addon + ".csv", index = True)
 
 
