@@ -1119,7 +1119,7 @@ def generate_qlesq_y(root_data_dir_path, output_name,  days_baseline_cutoff = 77
     selector = subject_selector(qlesq)
 
     # Exclude people who switched to level 2 (most likely d/t to adverse effects)
-    selector.filter_inappropriate_level_2()
+    selector.filter_early_level_2_follow_up()
 
     # Only consider rows that fall below the days baseline cutoff (default is 8 weeks or 77 days)
     selector.filter_time_window(max_cutoff = days_baseline_cutoff)

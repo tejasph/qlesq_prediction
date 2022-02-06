@@ -33,15 +33,20 @@ class subject_selector():
         self.df = self.df.drop(self.df[self.df['level'] == lvl].index)
         print(self.df.shape)
         
-    def filter_inappropriate_level_2(self):
+    def filter_early_level_2_follow_up(self):
         
         bad_ids = []
         grouped_df = self.df.groupby('subjectkey')
         
         for id, data in grouped_df:
             for row, col in data.iterrows():
-    
+                
+                # If person was already on a second medication before week4, then they likely had an adverse effect
                 if data[(data['days_baseline'] < 21) & (data['level'] == 'Level 2')].shape[0] > 0:
+                    bad_ids.append(id)
+                
+                # Same idea with follow up
+                elif data[(data['days_baseline'] < 21) & (data['level'] == 'Follow up')].shape[0] > 0: 
                     bad_ids.append(id)
                    
         self.df = self.df[~self.df['subjectkey'].isin(bad_ids)]
