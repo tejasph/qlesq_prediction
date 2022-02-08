@@ -32,4 +32,11 @@ python code/create_targets.py data/canbind_raw_data/q-les-q/canbind_qlesq_y
 Move Relevant Datasets to modelling folder:
 python code/move_modelling.py
 
+Create Train/Test Data:
+
+python code/train_test_split.py X_77_qlesq_sr__final_extval.csv y_qlesq_77__final__targets.csv 
+
+
+
+
 
