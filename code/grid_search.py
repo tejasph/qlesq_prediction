@@ -4,6 +4,7 @@ import os
 import typer
 import pandas as pd
 import numpy as np
+import datetime
 from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
@@ -41,24 +42,36 @@ def create_scaled_pipeline(model):
     return Pipeline([('scaler', MinMaxScaler()), model])
         
 
-def main(x_path: str, y_path: str):
+def main(x_data: str, y_data: str):
 
-    X = pd.read_csv(x_path).set_index('subjectkey')
-    y = pd.read_csv(y_path).set_index('subjectkey')
+    startTime = datetime.datetime.now()
+
+    x_path = os.path.join(DATA_MODELLING_FOLDER, x_data)
+    y_path = os.path.join(DATA_MODELLING_FOLDER, y_data)
+   
+    X = pd.read_csv(x_path + ".csv").set_index('subjectkey')
+    y = pd.read_csv(y_path + ".csv").set_index('subjectkey')
+
 
     y.columns = ['target']
 
-    rf =('rf', RandomForestClassifier()) 
-    rf_params = {'rf__max_features': ['sqrt', 'log2', 0.33, 0.2],
-            'rf__max_depth': [int(x) for x in np.linspace(2, 100, num = 20)]}
+    rf =('rf', RandomForestClassifier(n_estimators = 100, class_weight = 'balanced')) 
+    rf_params = {'rf__max_features': ['sqrt', 'log2', 0.33, 0.2, 0.1],
+            'rf__max_depth': [int(x) for x in np.linspace(2, 100, num = 10)],
+            'rf__min_samples_split': [2,4,6,8,10],
+            'rf__min_samples_leaf': [1,2,3,4,5],
+            'rf__min_impurity_decrease': [0.0, 0.1, 0.3],
+            'rf__criterion':['gini', 'entropy']}
 
     rf_pipe = create_scaled_pipeline(rf)
 
-    optimizer = model_optimizer(rf_pipe, rf_params, X, y, "rf_script_test")
+    optimizer = model_optimizer(rf_pipe, rf_params, X, y, "rf_full_broad_grid")
 
     optimizer.search_grid()
 
     optimizer.write_results()
+
+    print(f"Completed in: {datetime.datetime.now() - startTime}")
 
 
 if __name__ == "__main__":
