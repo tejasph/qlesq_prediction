@@ -9,6 +9,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
+from sklearn.neighbors import KNeighborsClassifier
 
 from globals import DATA_MODELLING_FOLDER
 
@@ -38,7 +39,7 @@ class model_optimizer():
         f.write(f"Parameter Grid: {self.params}\n\n")
         f.write(f"Best {self.metric} score was: {self.grid.best_score_} \n using the following params: {self.grid.best_params_}")
 
-def create_scaled_pipeline(model):
+def get_scaled_pipeline(model):
     return Pipeline([('scaler', MinMaxScaler()), model])
         
 
@@ -55,21 +56,56 @@ def main(x_data: str, y_data: str):
 
     y.columns = ['target']
 
-    rf =('rf', RandomForestClassifier(n_estimators = 100, class_weight = 'balanced')) 
-    rf_params = {'rf__max_features': ['sqrt', 'log2', 0.33, 0.2, 0.1],
-            'rf__max_depth': [int(x) for x in np.linspace(2, 100, num = 10)],
-            'rf__min_samples_split': [2,4,6,8,10],
-            'rf__min_samples_leaf': [1,2,3,4,5],
-            'rf__min_impurity_decrease': [0.0, 0.1, 0.3],
-            'rf__criterion':['gini', 'entropy']}
+###### RF grid search
+    # rf =('rf', RandomForestClassifier(n_estimators = 100, class_weight = 'balanced')) 
+    # rf_params = {'rf__max_features': ['sqrt', 'log2', 0.33, 0.2, 0.1],
+    #         'rf__max_depth': [int(x) for x in np.linspace(2, 100, num = 10)],
+    #         'rf__min_samples_split': [2,4,6,8,10],
+    #         'rf__min_samples_leaf': [1,2,3,4,5],
+    #         'rf__min_impurity_decrease': [0.0, 0.1, 0.3],
+    #         'rf__criterion':['gini', 'entropy']}
 
-    rf_pipe = create_scaled_pipeline(rf)
+    # rf_pipe = get_scaled_pipeline(rf)
 
-    optimizer = model_optimizer(rf_pipe, rf_params, X, y, "rf_full_broad_grid")
+    # optimizer = model_optimizer(rf_pipe, rf_params, X, y, "rf_full_broad_grid")
 
-    optimizer.search_grid()
+    # optimizer.search_grid()
 
-    optimizer.write_results()
+    # optimizer.write_results()
+
+######
+
+###### Logistic Regression Grid Search
+
+    # lr = ('lr', LogisticRegression(penalty = 'l2', class_weight = 'balanced', solver = 'liblinear'))
+    # lr_params = {'lr__tol' : [0.1, 0.01, 0.001, 'none'],
+    #             'lr__C': [p/1000 for p in range(90, 120, 1)],
+    #             'lr__penalty': ['l1', 'l2']}
+
+    # lr_pipe = get_scaled_pipeline(lr)
+
+    # lr_optimizer = model_optimizer(lr_pipe, lr_params, X, y, "lr_full_broad_grid")
+
+    # lr_optimizer.search_grid()
+
+    # lr_optimizer.write_results()
+
+###### 
+
+###### KNeighbors Classifier
+
+    knn = ('knn', KNeighborsClassifier())
+
+    knn_params = {'knn__n_neighbors': [n for n in range(1,31, 2)],
+                'knn__weights': ['uniform', 'distance'], 
+                'knn__p': [1,2]}
+
+    knn_pipe = get_scaled_pipeline(knn)
+
+    knn_optimizer = model_optimizer(knn_pipe, knn_params, X, y, "knn_full_broad_grid")
+
+    knn_optimizer.search_grid()
+    knn_optimizer.write_results()
 
     print(f"Completed in: {datetime.datetime.now() - startTime}")
 
