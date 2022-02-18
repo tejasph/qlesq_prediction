@@ -10,8 +10,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
 
-from globals import DATA_MODELLING_FOLDER
+from globals import DATA_MODELLING_FOLDER, GRID_SEARCH_RESULTS
 
 from sklearn.preprocessing import MinMaxScaler
 
@@ -34,7 +35,7 @@ class model_optimizer():
     def write_results(self):
         print(f"Best estimator was {self.grid.best_estimator_}")
         print(f"Avg validation score for the estimator was {self.grid.best_score_}")
-        f = open(os.path.join(r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\grid_search", self.name + '.txt'), 'w')
+        f = open(os.path.join(GRID_SEARCH_RESULTS, self.name + '.txt'), 'w')
         f.write(f"Model used: {self.pipeline}\n\n")
         f.write(f"Parameter Grid: {self.params}\n\n")
         f.write(f"Best {self.metric} score was: {self.grid.best_score_} \n using the following params: {self.grid.best_params_}")
@@ -94,20 +95,40 @@ def main(x_data: str, y_data: str):
 
 ###### KNeighbors Classifier
 
-    knn = ('knn', KNeighborsClassifier())
+    # knn = ('knn', KNeighborsClassifier())
 
-    knn_params = {'knn__n_neighbors': [n for n in range(1,31, 2)],
-                'knn__weights': ['uniform', 'distance'], 
-                'knn__p': [1,2]}
+    # knn_params = {'knn__n_neighbors': [n for n in range(1,31, 2)],
+    #             'knn__weights': ['uniform', 'distance'], 
+    #             'knn__p': [1,2]}
 
-    knn_pipe = get_scaled_pipeline(knn)
+    # knn_pipe = get_scaled_pipeline(knn)
 
-    knn_optimizer = model_optimizer(knn_pipe, knn_params, X, y, "knn_full_broad_grid")
+    # knn_optimizer = model_optimizer(knn_pipe, knn_params, X, y, "knn_full_broad_grid")
 
-    knn_optimizer.search_grid()
-    knn_optimizer.write_results()
+    # knn_optimizer.search_grid()
+    # knn_optimizer.write_results()
+
+
+######
+
+###### SVC Classifier
+
+    svc = ('svc', SVC(class_weight = 'balanced'))
+
+    svc_params = {'svc__gamma': ['scale', 'auto'],
+                'svc__C':[0.001, 0.01, 0.1, 1, 10, 100, 1000]}
+
+    svc_pipe = get_scaled_pipeline(svc)
+
+    svc_optimizer = model_optimizer(svc_pipe, svc_params, X, y, "svc_full_broad_grid")
+
+    svc_optimizer.search_grid()
+
+    svc_optimizer.write_results()
 
     print(f"Completed in: {datetime.datetime.now() - startTime}")
+
+######
 
 
 if __name__ == "__main__":
