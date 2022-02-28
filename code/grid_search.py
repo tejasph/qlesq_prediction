@@ -17,6 +17,11 @@ from globals import DATA_MODELLING_FOLDER, GRID_SEARCH_RESULTS
 from sklearn.preprocessing import MinMaxScaler
 
 class model_optimizer():
+    """
+    search_grid() -- searches of parameter grid for a specified model, using a specified metric, displays best estimator and its score
+    write_results() -- writes results of the grid search to a text file for future reference
+
+    """
     
     def __init__(self, pipeline, params, X, y, name):
         self.pipeline = pipeline
@@ -26,6 +31,7 @@ class model_optimizer():
         self.name = name
         
     def search_grid(self, metric = 'balanced_accuracy'):
+        
         self.metric = metric
         self.grid = GridSearchCV(estimator=self.pipeline, n_jobs= -1, scoring = metric, cv = 10, param_grid = self.params, return_train_score = True)
         self.grid.fit(self.X,self.y.target)

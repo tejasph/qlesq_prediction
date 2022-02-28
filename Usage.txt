@@ -37,6 +37,10 @@ Create Train/Test Data:
 python code/train_test_split.py X_77_qlesq_sr__final_extval.csv y_qlesq_77__final__targets.csv 
 
 
+Running an experiment:
+
+Experiments are run via run_experiment.py. It utilizes classes so code in main() will need to be altered to contain models of your choice. The type of data is given as arguements to main().
+
 
 
 

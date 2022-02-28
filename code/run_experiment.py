@@ -257,7 +257,8 @@ def main(x_data: str, y_data: str):
     exp_1 = experiment_manager(X, y)
 
     exp_1.models = {'Dummy Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
-          'Random Forest' : ('rf', RandomForestClassifier(criterion = 'entropy', class_weight = 'balanced', max_depth = 78, max_features = 'log2', min_impurity_decrease = 0.1, min_samples_leaf = 5, min_samples_split = 2)),
+          'Random Forest' : ('rf', RandomForestClassifier(criterion = 'entropy', class_weight = 'balanced', max_depth = 78, max_features = 'log2',
+                                                        min_impurity_decrease = 0.1, min_samples_leaf = 5, min_samples_split = 2)),
           'Logistic Regression': ('lr', LogisticRegression(solver = 'liblinear', class_weight = 'balanced', penalty = 'l1', C = 0.099, tol = 0.1)),
           'KNearest Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 15, p = 1, weights = 'uniform')),
           'Support Vector Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'auto', probability = True) )}
