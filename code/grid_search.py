@@ -23,11 +23,13 @@ class model_optimizer():
 
     """
     
-    def __init__(self, pipeline, params, X, y, name):
+    def __init__(self, pipeline, params, X, y, x_data, y_data, name):
         self.pipeline = pipeline
         self.params = params
         self.X = X
         self.y = y
+        self.X_type = x_data
+        self.y_type = y_data
         self.name = name
         
     def search_grid(self, metric = 'balanced_accuracy'):
@@ -99,6 +101,23 @@ def main(x_data: str, y_data: str):
 
 ###### 
 
+###### Logistic Regression Saga solver Grid Search
+
+    lr = ('lr', LogisticRegression(penalty = 'elasticnet', class_weight = 'balanced', solver = 'saga', max_iter = 1000))
+    lr_params = {'lr__tol' : [0.1, 0.01, 0.001, 0.0001],
+                'lr__C': [p/1000 for p in range(90, 120, 1)],
+                'lr__l1_ratio': [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]}
+
+    lr_pipe = get_scaled_pipeline(lr)
+
+    lr_optimizer = model_optimizer(lr_pipe, lr_params, X, y, x_data, y_data,  "lr_full_saga")
+
+    lr_optimizer.search_grid()
+
+    lr_optimizer.write_results()
+
+###### 
+
 ###### KNeighbors Classifier
 
     # knn = ('knn', KNeighborsClassifier())
@@ -119,20 +138,20 @@ def main(x_data: str, y_data: str):
 
 ###### SVC Classifier
 
-    svc = ('svc', SVC(class_weight = 'balanced'))
+    # svc = ('svc', SVC(class_weight = 'balanced'))
 
-    svc_params = {'svc__gamma': ['scale', 'auto'],
-                'svc__C':[0.001, 0.01, 0.1, 1, 10, 100, 1000]}
+    # svc_params = {'svc__gamma': ['scale', 'auto'],
+    #             'svc__C':[0.001, 0.01, 0.1, 1, 10, 100, 1000]}
 
-    svc_pipe = get_scaled_pipeline(svc)
+    # svc_pipe = get_scaled_pipeline(svc)
 
-    svc_optimizer = model_optimizer(svc_pipe, svc_params, X, y, "svc_full_broad_grid")
+    # svc_optimizer = model_optimizer(svc_pipe, svc_params, X, y, "svc_full_broad_grid")
 
-    svc_optimizer.search_grid()
+    # svc_optimizer.search_grid()
 
-    svc_optimizer.write_results()
+    # svc_optimizer.write_results()
 
-    print(f"Completed in: {datetime.datetime.now() - startTime}")
+    # print(f"Completed in: {datetime.datetime.now() - startTime}")
 
 ######
 

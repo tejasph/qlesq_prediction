@@ -34,11 +34,13 @@ from sklearn.metrics import confusion_matrix
 
 class experiment_manager():
     
-    def __init__(self, X, y):
+    def __init__(self, X, y, x_data, y_data):
         
         # Establish data, models, and runs for the experiment
         self.X = X
         self.y = y
+        self.X_type = x_data
+        self.y_type = y_data
         self.models = dict()
         self.runs = 10
 
@@ -239,6 +241,10 @@ class experiment_manager():
         self.std_results.to_csv(out_path + "/" + exp_name + "_std.csv" ,index = False)
         merged_df.to_csv(out_path + "/" + exp_name + "_merged.csv" ,index = False)
 
+        f = open(os.path.join(out_path, exp_name + '.txt'), 'w')
+        f.write(f"Model used: {self.models}\n\n")
+        f.write(f"Evaluated using {self.X_type} and {self.y_type}")
+
 
 
 def main(x_data: str, y_data: str):
@@ -254,12 +260,11 @@ def main(x_data: str, y_data: str):
 
     y.columns = ['subjectkey', 'target']
 
-    exp_1 = experiment_manager(X, y)
+    exp_1 = experiment_manager(X, y, x_data, y_data)
 
     exp_1.models = {'Dummy Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
-          'Random Forest' : ('rf', RandomForestClassifier(criterion = 'entropy', class_weight = 'balanced', max_depth = 78, max_features = 'log2',
-                                                        min_impurity_decrease = 0.1, min_samples_leaf = 5, min_samples_split = 2)),
-          'Logistic Regression': ('lr', LogisticRegression(solver = 'liblinear', class_weight = 'balanced', penalty = 'l1', C = 0.099, tol = 0.1)),
+          'Random Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
+          'Logistic Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.096, tol = 0.1, l1_ratio = 0.8)),
           'KNearest Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 15, p = 1, weights = 'uniform')),
           'Support Vector Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'auto', probability = True) )}
 
@@ -268,7 +273,7 @@ def main(x_data: str, y_data: str):
     print(exp_1.avg_results)
     print(exp_1.std_results)
 
-    exp_1.store_results(EXPERIMENT_RESULTS, "exp_1_CV_full_features")
+    exp_1.store_results(EXPERIMENT_RESULTS, "exp_1_CV_full_features_final")
 
 
 if __name__ == "__main__":
