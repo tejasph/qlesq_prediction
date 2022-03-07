@@ -36,6 +36,12 @@ Create Train/Test Data:
 
 python code/train_test_split.py X_77_qlesq_sr__final_extval.csv y_qlesq_77__final__targets.csv 
 
+Running a GridSearch:
+
+Manually adjust grid_search.py for model of interest and params to explore
+
+python code/grid_search.py X_train_77 y_train_77 (input data you want to optimize for)
+
 
 Running an experiment:
 
