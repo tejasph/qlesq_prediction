@@ -262,19 +262,28 @@ def main(x_data: str, y_data: str):
 
     exp_1 = experiment_manager(X, y, x_data, y_data)
 
-    exp_1.models = {'Dummy Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
-          'Random Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
-          'Logistic Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.096, tol = 0.1, l1_ratio = 0.8)),
-          'KNearest Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 15, p = 1, weights = 'uniform')),
-          'Support Vector Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'auto', probability = True) )}
+    # full Feature models
+    # exp_1.models = {'Dummy Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
+    #       'Random Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
+    #       'Logistic Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.096, tol = 0.1, l1_ratio = 0.8)),
+    #       'KNearest Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 15, p = 1, weights = 'uniform')),
+    #       'Support Vector Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'auto', probability = True) )}
+
+    # Overlapping models
+    exp_1.models = {'Dummy Classification': ('dummy', DummyClassifier(strategy = 'stratified')),
+                    'Logistic Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.091, tol = 0.1, l1_ratio = 0.9)),
+                    'Random Forest' :('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
+                    'KNearest Neighbors' :('knn', KNeighborsClassifier(n_neighbors = 1, p = 1, weights = 'uniform')),
+                    'SVC' :('svc', SVC(class_weight = 'balanced', C= 1, gamma= 'scale', probability = True))}
 
     exp_1.run_experiment()
 
     print(exp_1.avg_results)
     print(exp_1.std_results)
 
-    exp_1.store_results(EXPERIMENT_RESULTS, "exp_1_CV_full_features_final")
+    exp_1.store_results(EXPERIMENT_RESULTS, "overlap_results_77")
 
+    
 
 if __name__ == "__main__":
     typer.run(main)

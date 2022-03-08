@@ -221,18 +221,26 @@ def main(x_train_data: str, y_train_data: str, x_test_data: str, y_test_data:str
 
     eval_1 = evaluation_manager(X_train, y_train, X_test, y_test, x_train_data, y_train_data, x_test_data, y_test_data)
 
-    eval_1.models = {'Dummy Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
-          'Random Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
-          'Logistic Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.096, tol = 0.1, l1_ratio = 0.8)),
-          'KNearest Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 15, p = 1, weights = 'uniform')),
-          'Support Vector Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'auto', probability = True))}
+    # Regular Models
+    # eval_1.models = {'Dummy Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
+    #       'Random Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
+    #       'Logistic Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.096, tol = 0.1, l1_ratio = 0.8)),
+    #       'KNearest Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 15, p = 1, weights = 'uniform')),
+    #       'Support Vector Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'auto', probability = True))}
+
+    # Overlapping models
+    eval_1.models = {'Dummy Classification': ('dummy', DummyClassifier(strategy = 'stratified')),
+                    'Logistic Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.091, tol = 0.1, l1_ratio = 0.9)),
+                    'Random Forest' :('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
+                    'KNearest Neighbors' :('knn', KNeighborsClassifier(n_neighbors = 1, p = 1, weights = 'uniform')),
+                    'SVC' :('svc', SVC(class_weight = 'balanced', C= 1, gamma= 'scale', probability = True))}
 
     eval_1.run_evaluation()
 
     print(eval_1.avg_results)
     print(eval_1.std_results)
 
-    eval_1.store_results(EVALUATION_RESULTS, "eval_STARD_holdout")
+    eval_1.store_results(EVALUATION_RESULTS, "eval_STARD_holdout_over")
 
 
 if __name__ == "__main__":

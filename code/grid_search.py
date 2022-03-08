@@ -103,18 +103,18 @@ def main(x_data: str, y_data: str):
 
 ###### Logistic Regression Saga solver Grid Search
 
-    lr = ('lr', LogisticRegression(penalty = 'elasticnet', class_weight = 'balanced', solver = 'saga', max_iter = 1000))
-    lr_params = {'lr__tol' : [0.1, 0.01, 0.001, 0.0001],
-                'lr__C': [p/1000 for p in range(90, 120, 1)],
-                'lr__l1_ratio': [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]}
+    # lr = ('lr', LogisticRegression(penalty = 'elasticnet', class_weight = 'balanced', solver = 'saga', max_iter = 1000))
+    # lr_params = {'lr__tol' : [0.1, 0.01, 0.001, 0.0001],
+    #             'lr__C': [p/1000 for p in range(90, 120, 1)],
+    #             'lr__l1_ratio': [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]}
 
-    lr_pipe = get_scaled_pipeline(lr)
+    # lr_pipe = get_scaled_pipeline(lr)
 
-    lr_optimizer = model_optimizer(lr_pipe, lr_params, X, y, x_data, y_data,  "lr_full_saga")
+    # lr_optimizer = model_optimizer(lr_pipe, lr_params, X, y, x_data, y_data,  "lr_full_saga")
 
-    lr_optimizer.search_grid()
+    # lr_optimizer.search_grid()
 
-    lr_optimizer.write_results()
+    # lr_optimizer.write_results()
 
 ###### 
 
@@ -155,6 +155,80 @@ def main(x_data: str, y_data: str):
 
 ######
 
+################################ Optimizing Overlapping feature models
+
+###### RF grid search
+    # rf =('rf', RandomForestClassifier(n_estimators = 100, class_weight = 'balanced')) 
+    # rf_params = {'rf__max_features': ['sqrt', 'log2', 0.33, 0.2, 0.1],
+    #         'rf__max_depth': [int(x) for x in np.linspace(2, 100, num = 10)],
+    #         'rf__min_samples_split': [2,4,6,8,10],
+    #         'rf__min_samples_leaf': [1,2,3,4,5],
+    #         'rf__min_impurity_decrease': [0.0, 0.1, 0.3],
+    #         'rf__criterion':['gini', 'entropy']}
+
+    # rf_pipe = get_scaled_pipeline(rf)
+
+    # optimizer = model_optimizer(rf_pipe, rf_params, X, y,x_data, y_data, "rf_overlap")
+
+    # optimizer.search_grid()
+
+    # optimizer.write_results()
+
+######
+
+###### Logistic Regression Grid Search w/ SAGA
+
+    # lr = ('lr', LogisticRegression(penalty = 'elasticnet', class_weight = 'balanced', solver = 'saga', max_iter = 1000))
+    # lr_params = {'lr__tol' : [0.1, 0.01, 0.001, 0.0001],
+    #             'lr__C': [p/1000 for p in range(90, 120, 1)],
+    #             'lr__l1_ratio': [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]}
+
+    # lr_pipe = get_scaled_pipeline(lr)
+
+    # lr_optimizer = model_optimizer(lr_pipe, lr_params, X, y,x_data, y_data, "lr_overlap")
+
+    # lr_optimizer.search_grid()
+
+    # lr_optimizer.write_results()
+
+###### 
+
+###### KNeighbors Classifier
+
+    knn = ('knn', KNeighborsClassifier())
+
+    knn_params = {'knn__n_neighbors': [n for n in range(1,31, 2)],
+                'knn__weights': ['uniform', 'distance'], 
+                'knn__p': [1,2]}
+
+    knn_pipe = get_scaled_pipeline(knn)
+
+    knn_optimizer = model_optimizer(knn_pipe, knn_params, X, y, x_data, y_data,  "knn_overlap")
+
+    knn_optimizer.search_grid()
+    knn_optimizer.write_results()
+
+
+######
+
+###### SVC Classifier
+
+    svc = ('svc', SVC(class_weight = 'balanced'))
+
+    svc_params = {'svc__gamma': ['scale', 'auto'],
+                'svc__C':[0.001, 0.01, 0.1, 1, 10, 100, 1000]}
+
+    svc_pipe = get_scaled_pipeline(svc)
+
+    svc_optimizer = model_optimizer(svc_pipe, svc_params, X, y,x_data, y_data, "svc_overlap")
+
+    svc_optimizer.search_grid()
+
+    svc_optimizer.write_results()
+
+    print(f"Completed in: {datetime.datetime.now() - startTime}")
+
+######
 
 if __name__ == "__main__":
     typer.run(main)
