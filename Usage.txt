@@ -1,9 +1,9 @@
-Processing the STARD data:
+1) Processing the STARD data:
 
 C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction>python code/data-cleaning/stard_preprocessing_manager.py data/STARD_raw -a
 
 
-Processing the CANBIND data:
+2) Processing the CANBIND data:
 
 C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction>python code/data-cleaning/canbind_preprocessing_manager.py
 
@@ -17,11 +17,11 @@ note: before running this, go into canbind_preprocessing_manager.py and alter pa
         convert_canbind_to_overlapping(pathData)
 
 
-Create Overlapping Data from processed data:
+3) Create Overlapping Data from processed data:
 
 C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction>python code/data-cleaning/generate_overlapping_features.py -both data/STARD_raw/processed_data/final_xy_data_matrices data/canbind_raw_data/
 
-Create y targets:
+4) Create y targets:
 
 python code/create_targets.py data/STARD_raw/processed_data/final_xy_data_matrices/y_qlesq_77__final
 
@@ -29,24 +29,32 @@ python code/create_targets.py data/STARD_raw/processed_data/final_xy_data_matric
 
 python code/create_targets.py data/canbind_raw_data/q-les-q/canbind_qlesq_y
 
-Move Relevant Datasets to modelling folder:
+5) Move Relevant Datasets to modelling folder:
 python code/move_modelling.py
 
-Create Train/Test Data:
+6) Create Train/Test Data:
 
 python code/train_test_split.py X_77_qlesq_sr__final_extval.csv y_qlesq_77__final__targets.csv 
 
-Running a GridSearch:
+7) Optional: Running a GridSearch
 
 Manually adjust grid_search.py for model of interest and params to explore
 
 python code/grid_search.py X_train_77 y_train_77 (input data you want to optimize for)
 
 
-Running an experiment:
+8) Running an experiment:
 
 Experiments are run via run_experiment.py. It utilizes classes so code in main() will need to be altered to contain models of your choice. The type of data is given as arguements to main().
 
+9) Run an Evaluation on STARD and CANBIND holdout sets:
+
+There are three options:
+- Full feature evalution on STARD holdout   (eval_type ="full")
+- Overlapping feature evaluation on STARD holdout (eval_type = "over")
+- Overlapping feature evaluation on CANBIND holdout (eval_type = "canbind")
+
+python code/run_evaluation [eval_type] [a name for the evaluation]
 
 
 
