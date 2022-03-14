@@ -8,7 +8,7 @@ import typer
 import os
 
 # Import paths
-from globals import DATA_MODELLING_FOLDER, EVALUATION_RESULTS
+from globals import DATA_MODELLING_FOLDER, EVALUATION_RESULTS, full_feat_models, overlapping_feat_models
 
 # Import sklearn processing/pipeline
 from sklearn.pipeline import Pipeline
@@ -200,9 +200,25 @@ class evaluation_manager():
         f.write(f"Evaluated on  {self.X_test_type} and {self.y_test_type}")
 
 
-def main(x_train_data: str, y_train_data: str, x_test_data: str, y_test_data:str):
+def main(eval_type : str, eval_name : str):
 
     startTime = datetime.datetime.now()
+
+    if eval_type == "full": 
+        x_train_data = "X_train_77"
+        y_train_data = "y_train_77"
+        x_test_data = "X_test_77"
+        y_test_data = "y_test_77"
+
+        models = full_feat_models
+
+    elif eval_type == "over":
+        x_train_data = "X_train_77_over"
+        y_train_data = "y_train_77"
+        x_test_data = "X_test_77_over"
+        y_test_data = "y_test_77"
+
+        models = overlapping_feat_models
 
     x_train_path = os.path.join(DATA_MODELLING_FOLDER, x_train_data)
     y_train_path = os.path.join(DATA_MODELLING_FOLDER, y_train_data)
@@ -229,18 +245,19 @@ def main(x_train_data: str, y_train_data: str, x_test_data: str, y_test_data:str
     #       'Support Vector Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'auto', probability = True))}
 
     # Overlapping models
-    eval_1.models = {'Dummy Classification': ('dummy', DummyClassifier(strategy = 'stratified')),
-                    'Logistic Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.091, tol = 0.1, l1_ratio = 0.9)),
-                    'Random Forest' :('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
-                    'KNearest Neighbors' :('knn', KNeighborsClassifier(n_neighbors = 1, p = 1, weights = 'uniform')),
-                    'SVC' :('svc', SVC(class_weight = 'balanced', C= 1, gamma= 'scale', probability = True))}
+    # eval_1.models = {'Dummy Classification': ('dummy', DummyClassifier(strategy = 'stratified')),
+    #                 'Logistic Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.091, tol = 0.1, l1_ratio = 0.9)),
+    #                 'Random Forest' :('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
+    #                 'KNearest Neighbors' :('knn', KNeighborsClassifier(n_neighbors = 1, p = 1, weights = 'uniform')),
+    #                 'SVC' :('svc', SVC(class_weight = 'balanced', C= 1, gamma= 'scale', probability = True))}
+    eval_1.models = models
 
     eval_1.run_evaluation()
 
     print(eval_1.avg_results)
     print(eval_1.std_results)
 
-    eval_1.store_results(EVALUATION_RESULTS, "eval_STARD_holdout_over")
+    eval_1.store_results(EVALUATION_RESULTS, eval_name)
 
 
 if __name__ == "__main__":
