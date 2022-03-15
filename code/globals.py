@@ -28,6 +28,3 @@ overlapping_feat_models = {'Dummy Classification': ('dummy', DummyClassifier(str
                 'Random Forest' :('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
                 'KNearest Neighbors' :('knn', KNeighborsClassifier(n_neighbors = 1, p = 1, weights = 'uniform')),
                 'SVC' :('svc', SVC(class_weight = 'balanced', C= 1, gamma= 'scale', probability = True))}
-
-
-# Canbind Variables

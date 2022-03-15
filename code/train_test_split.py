@@ -43,9 +43,9 @@ def main(x_data: str, y_data: str , y_type: str = 'qlesq_QoL_threshold'):
 
 
     X_train.to_csv(DATA_MODELLING_FOLDER + "/X_train_"+ name_addon +".csv" , index = True)
-    y_train.to_csv(DATA_MODELLING_FOLDER + "/y_train.csv", index = True)
+    y_train.to_csv(DATA_MODELLING_FOLDER + "/y_train_" + name_addon + ".csv", index = True)
     X_test.to_csv(DATA_MODELLING_FOLDER + "/X_test_"+ name_addon + ".csv", index = True)
-    y_test.to_csv(DATA_MODELLING_FOLDER + "/y_test.csv", index = True)
+    y_test.to_csv(DATA_MODELLING_FOLDER + "/y_test_" + name_addon + ".csv", index = True)
 
 
     print(f"Completed in: {datetime.datetime.now() - startTime}")
