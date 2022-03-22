@@ -36,6 +36,8 @@ python code/move_modelling.py
 
 python code/train_test_split.py X_77_qlesq_sr__final_extval.csv y_qlesq_77__final__targets.csv 
 
+python code/train_test_split.py X_77_qlesq_sr__final.csv y_qlesq_77__final__targets.csv 
+
 7) Optional: Running a GridSearch
 
 Manually adjust grid_search.py for model of interest and params to explore
