@@ -14,17 +14,19 @@ EVALUATION_RESULTS = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\r
 
 
 # Full  Variables
-full_feat_models = {'Dummy Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
-      'Random Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
-      'Logistic Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.096, tol = 0.1, l1_ratio = 0.8)),
-      'KNearest Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 15, p = 1, weights = 'uniform')),
-      'Support Vector Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'auto', probability = True))}
+full_feat_models = {'Dummy_Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
+      'Random_Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
+      'Logistic_Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.096, tol = 0.1, l1_ratio = 0.8)),
+      'KNearest_Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 15, p = 1, weights = 'uniform')),
+      'Support_Vector_Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'auto', probability = True))}
+
+
 
 
 # Overlapping  Variables
 
-overlapping_feat_models = {'Dummy Classification': ('dummy', DummyClassifier(strategy = 'stratified')),
-                'Logistic Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.091, tol = 0.1, l1_ratio = 0.9)),
-                'Random Forest' :('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
-                'KNearest Neighbors' :('knn', KNeighborsClassifier(n_neighbors = 1, p = 1, weights = 'uniform')),
-                'SVC' :('svc', SVC(class_weight = 'balanced', C= 1, gamma= 'scale', probability = True))}
+overlapping_feat_models = {'Dummy_Classification': ('dummy', DummyClassifier(strategy = 'stratified')),
+                'Logistic_Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.091, tol = 0.1, l1_ratio = 0.9)),
+                'Random_Forest' :('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
+                'KNearest_Neighbors' :('knn', KNeighborsClassifier(n_neighbors = 1, p = 1, weights = 'uniform')),
+                'Support_Vector_Machine' :('svc', SVC(class_weight = 'balanced', C= 1, gamma= 'scale', probability = True))}

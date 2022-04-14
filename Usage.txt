@@ -56,7 +56,7 @@ There are three options:
 - Overlapping feature evaluation on STARD holdout (eval_type = "over")
 - Overlapping feature evaluation on CANBIND holdout (eval_type = "canbind")
 
-python code/run_evaluation [eval_type] [a name for the evaluation]
+python code/run_evaluation.py [eval_type] [a name for the evaluation]
 
 
 

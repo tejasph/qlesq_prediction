@@ -34,7 +34,7 @@ from sklearn.metrics import confusion_matrix
 
 class evaluation_manager():
     
-    def __init__(self, X_train,y_train, X_test, y_test, x_train_data, y_train_data, x_test_data, y_test_data):
+    def __init__(self, X_train,y_train, X_test, y_test, x_train_data, y_train_data, x_test_data, y_test_data, eval_name, EVALUATION_RESULTS):
         
         # Establish data, models, and runs for the experiment
         self.X_train = X_train
@@ -47,9 +47,19 @@ class evaluation_manager():
         self.y_test_type = y_test_data
         self.models = dict()
         self.runs = 10
+        self.results_path = EVALUATION_RESULTS
+        self.eval_name = eval_name
+
+        self.out_path = os.path.join(self.results_path, self.eval_name)
+
+        if os.path.isdir(self.out_path):
+            raise Exception("Name already exists")
+        else:
+            os.mkdir(self.out_path + "/")
+        
 
         
-    def eval_run(self, pipe_model):    
+    def eval_run(self, pipe_model, model_name):    
         """
         Evaluates prepare pipeline model
 
@@ -89,8 +99,25 @@ class evaluation_manager():
         train_bal_acc = balanced_accuracy_score(self.y_train, training_predictions)
         test_bal_acc = balanced_accuracy_score(self.y_test, test_predictions)
 
-        return train_bal_acc, train_auc, train_sens, train_spec, train_prec, train_npv, test_bal_acc, test_auc, test_sens, test_spec, test_prec, test_npv
+        # Feature Importances 
+        print(pipe_model.steps[1][1])
+        if model_name == 'Dummy_Classification' or model_name == "KNearest_Neighbors" or model_name == "Support_Vector_Machine":
+            FI = np.zeros(len(self.X_train.columns))
+        elif model_name == 'Logistic_Regression':
+            FI = pipe_model.steps[1][1].coef_.flatten()
+        elif model_name == 'Random_Forest':
+            FI = pipe_model.steps[1][1].feature_importances_.flatten()
+        else: raise Exception("model_name doesn't match options for FI")
 
+        return train_bal_acc, train_auc, train_sens, train_spec, train_prec, train_npv, test_bal_acc, test_auc, test_sens, test_spec, test_prec, test_npv, FI
+
+    def process_feature_importances(self, FI_array, model_name):
+ 
+        FI_array = FI_array/self.runs
+        feat_importance_dict = {"Feature": self.X_train.columns, "Weight": FI_array}
+        self.FI_df = pd.DataFrame(feat_importance_dict).sort_values(by = "Weight", ascending = False)
+        self.FI_df.to_csv(self.out_path + "/" + model_name + "_FI.csv")
+        return
     
     def run_evaluation(self):
         startTime = datetime.datetime.now()
@@ -111,6 +138,10 @@ class evaluation_manager():
             runs_dict = {'run':[], 
                       'train_bal_acc':[],'train_auc':[],'train_sens':[], 'train_spec': [], 'train_ppv':[], 'train_npv':[],
                       'test_bal_acc':[], 'test_auc':[], 'test_sens':[], 'test_spec':[], 'test_ppv':[], 'test_npv':[]}
+
+            # Will track feat importances across runs
+            feat_importances = np.zeros(len(self.X_train.columns))
+
             # Run experiment multiple times (ex. 100)
             for r in range(self.runs):
 
@@ -119,7 +150,7 @@ class evaluation_manager():
 
                 runs_dict['run'].append(run)
 
-                run_results = self.eval_run(pipe)
+                run_results = self.eval_run(pipe, model_name)
                 
                 # Unloading tuple in order of: 
                 # avg_t_bal_acc, avg_t_auc ,avg_t_sens, avg_t_spec, avg_t_prec, avg_t_npv, (0-5)
@@ -138,6 +169,8 @@ class evaluation_manager():
                 runs_dict['test_spec'].append(run_results[9])
                 runs_dict['test_ppv'].append(run_results[10])
                 runs_dict['test_npv'].append(run_results[11])
+
+                feat_importances += run_results[12]
 
                 run +=1
 
@@ -174,27 +207,24 @@ class evaluation_manager():
             std_results['std_test_ppv'].append(runs_df['test_ppv'].std())
             std_results['std_test_npv'].append(runs_df['test_npv'].std())
 
+            self.process_feature_importances(feat_importances, model_name)
+
         self.avg_results = pd.DataFrame(exp_results)
         self.std_results = pd.DataFrame(std_results)
+        
 
         print(f"Completed in: {datetime.datetime.now() - startTime}")
 
-    def store_results(self, results_path, exp_name):
+    def store_results(self):
         
-        out_path = os.path.join(results_path, exp_name) 
 
-        if os.path.isdir(out_path):
-            raise Exception("Name already exists")
-        else:
-            os.mkdir(out_path + "/")
-        
         merged_df = self.avg_results.merge(self.std_results, on = 'model')
 
-        self.avg_results.to_csv(out_path + "/" + exp_name + "_avg.csv" ,index = False)
-        self.std_results.to_csv(out_path + "/" + exp_name + "_std.csv" ,index = False)
-        merged_df.to_csv(out_path + "/" + exp_name + "_merged.csv" ,index = False)
+        self.avg_results.to_csv(self.out_path + "/" + self.eval_name + "_avg.csv" ,index = False)
+        self.std_results.to_csv(self.out_path + "/" + self.eval_name + "_std.csv" ,index = False)
+        merged_df.to_csv(self.out_path + "/" + self.eval_name + "_merged.csv" ,index = False)
 
-        f = open(os.path.join(out_path, exp_name + '.txt'), 'w')
+        f = open(os.path.join(self.out_path, self.eval_name + '.txt'), 'w')
         f.write(f"Model used: {self.models}\n\n")
         f.write(f"Trained on  {self.X_train_type} and {self.y_train_type}\n\n")
         f.write(f"Evaluated on  {self.X_test_type} and {self.y_test_type}")
@@ -257,7 +287,7 @@ def main(eval_type : str, eval_name : str):
     y_train.columns = ['target']
     y_test.columns = ['target']
 
-    eval_1 = evaluation_manager(X_train, y_train, X_test, y_test, x_train_data, y_train_data, x_test_data, y_test_data)
+    eval_1 = evaluation_manager(X_train, y_train, X_test, y_test, x_train_data, y_train_data, x_test_data, y_test_data, eval_name, EVALUATION_RESULTS)
 
     # Regular Models
     # eval_1.models = {'Dummy Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
@@ -279,7 +309,7 @@ def main(eval_type : str, eval_name : str):
     print(eval_1.avg_results)
     print(eval_1.std_results)
 
-    eval_1.store_results(EVALUATION_RESULTS, eval_name)
+    eval_1.store_results()
 
 
 if __name__ == "__main__":
