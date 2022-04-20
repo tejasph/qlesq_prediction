@@ -59,4 +59,14 @@ There are three options:
 python code/run_evaluation.py [eval_type] [a name for the evaluation]
 
 
+Optional Scripts:
 
+a) RFE Selection
+
+There are three options for eval type:
+- Full features   (eval_type ="full")
+- Overlapping features  (eval_type = "over")
+
+
+Usage: python code/rfe_selection.py [eval_type] [rfe_step] [n_feats to select]
+ex. python code/rfe_selection.py full 1 30
