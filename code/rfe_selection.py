@@ -68,6 +68,8 @@ def main(eval_type : str, rfe_step : int  = typer.Argument(10), n_features :int 
     print(X_train_rfe.head())
 
     X_train_rfe.to_csv(DATA_MODELLING_FOLDER + "/" + x_train_data + "_rfe.csv", index = False)
+    X_test_rfe.to_csv(DATA_MODELLING_FOLDER + "/" + x_test_data + "_rfe.csv", index = False)
+    
     print(f"Completed in: {datetime.datetime.now() - startTime}")
 
 if __name__ == "__main__":
