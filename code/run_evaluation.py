@@ -34,7 +34,7 @@ from sklearn.metrics import confusion_matrix
 
 class evaluation_manager():
     
-    def __init__(self, X_train,y_train, X_test, y_test, x_train_data, y_train_data, x_test_data, y_test_data, eval_name, EVALUATION_RESULTS):
+    def __init__(self, X_train, y_train, X_test, y_test, x_train_data, y_train_data, x_test_data, y_test_data, eval_name, EVALUATION_RESULTS):
         
         # Establish data, models, and runs for the experiment
         self.X_train = X_train
