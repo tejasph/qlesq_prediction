@@ -155,7 +155,9 @@ def main(x_data: str, y_data: str):
 
 ######
 
-################################ Optimizing Overlapping feature models
+############################################################################################## 
+# Optimizing Overlapping feature models
+##############################################################################################
 
 ###### RF grid search
     # rf =('rf', RandomForestClassifier(n_estimators = 100, class_weight = 'balanced')) 
@@ -195,40 +197,44 @@ def main(x_data: str, y_data: str):
 
 ###### KNeighbors Classifier
 
-    knn = ('knn', KNeighborsClassifier())
+    # knn = ('knn', KNeighborsClassifier())
 
-    knn_params = {'knn__n_neighbors': [n for n in range(1,31, 2)],
-                'knn__weights': ['uniform', 'distance'], 
-                'knn__p': [1,2]}
+    # knn_params = {'knn__n_neighbors': [n for n in range(1,31, 2)],
+    #             'knn__weights': ['uniform', 'distance'], 
+    #             'knn__p': [1,2]}
 
-    knn_pipe = get_scaled_pipeline(knn)
+    # knn_pipe = get_scaled_pipeline(knn)
 
-    knn_optimizer = model_optimizer(knn_pipe, knn_params, X, y, x_data, y_data,  "knn_overlap")
+    # knn_optimizer = model_optimizer(knn_pipe, knn_params, X, y, x_data, y_data,  "knn_overlap")
 
-    knn_optimizer.search_grid()
-    knn_optimizer.write_results()
+    # knn_optimizer.search_grid()
+    # knn_optimizer.write_results()
 
 
 ######
 
 ###### SVC Classifier
 
-    svc = ('svc', SVC(class_weight = 'balanced'))
+    # svc = ('svc', SVC(class_weight = 'balanced'))
 
-    svc_params = {'svc__gamma': ['scale', 'auto'],
-                'svc__C':[0.001, 0.01, 0.1, 1, 10, 100, 1000]}
+    # svc_params = {'svc__gamma': ['scale', 'auto'],
+    #             'svc__C':[0.001, 0.01, 0.1, 1, 10, 100, 1000]}
 
-    svc_pipe = get_scaled_pipeline(svc)
+    # svc_pipe = get_scaled_pipeline(svc)
 
-    svc_optimizer = model_optimizer(svc_pipe, svc_params, X, y,x_data, y_data, "svc_overlap")
+    # svc_optimizer = model_optimizer(svc_pipe, svc_params, X, y,x_data, y_data, "svc_overlap")
 
-    svc_optimizer.search_grid()
+    # svc_optimizer.search_grid()
 
-    svc_optimizer.write_results()
+    # svc_optimizer.write_results()
 
-    print(f"Completed in: {datetime.datetime.now() - startTime}")
+    # print(f"Completed in: {datetime.datetime.now() - startTime}")
 
 ######
+
+################################################################################################################
+# RFE Full Feature Optimization
+################################################################################################################
 
 if __name__ == "__main__":
     typer.run(main)
