@@ -30,3 +30,11 @@ overlapping_feat_models = {'Dummy_Classification': ('dummy', DummyClassifier(str
                 'Random_Forest' :('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
                 'KNearest_Neighbors' :('knn', KNeighborsClassifier(n_neighbors = 1, p = 1, weights = 'uniform')),
                 'Support_Vector_Machine' :('svc', SVC(class_weight = 'balanced', C= 1, gamma= 'scale', probability = True))}
+
+
+# Full Features with RFE (30 features selected)
+full_feat_models_rfe = {'Dummy_Classification': ('dummy', DummyClassifier(strategy = 'stratified')),
+                'Logistic_Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.105, tol = 0.1, l1_ratio = 0.7)),
+                'Random_Forest' :('rf', RandomForestClassifier(class_weight = 'balanced', criterion = 'entropy', max_depth = 2, max_features = 0.1, min_impurity_decrease = 0.0, min_samples_leaf = 5, min_samples_split = 2)),
+                'KNearest_Neighbors' :('knn', KNeighborsClassifier(n_neighbors = 7, p = 1, weights = 'uniform')),
+                'Support_Vector_Machine' :('svc', SVC(class_weight = 'balanced', C= 1, gamma= 'scale', probability = True))}

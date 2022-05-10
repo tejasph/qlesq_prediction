@@ -38,7 +38,7 @@ python code/train_test_split.py X_77_qlesq_sr__final_extval.csv y_qlesq_77__fina
 
 python code/train_test_split.py X_77_qlesq_sr__final.csv y_qlesq_77__final__targets.csv 
 
-7) Optional: Running a GridSearch
+7) Optional: Running a GridSearch (before running, check parameter grids and names within the script)
 
 Manually adjust grid_search.py for model of interest and params to explore
 

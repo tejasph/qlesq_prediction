@@ -365,7 +365,6 @@ def qlesq_y_gen(root_dir):
             continue
 
 
-
         assert group.shape[0] <= 3, f"Shouldn't be more than 4 rows for {subject}"
         assert group.duplicated().sum() == 0, f"Duplicate rows detected for {subject}"
         assert group['transformed_qlesq'].isna().sum() == 0, f"Total Qlesq has {group['transformed_qlesq'].isna().sum()} NA values for {subject}"
@@ -378,6 +377,13 @@ def qlesq_y_gen(root_dir):
         baseline = group[group['EVENTNAME'] == 'Baseline']['transformed_qlesq'].values[0]
         baseline_max_raw = group[group['EVENTNAME'] == 'Baseline']['max_raw_total'].values[0]
         baseline_actual_raw = group[group['EVENTNAME'] == 'Baseline']['total_raw_QLESQ'].values[0]
+
+        
+        # Exclude patients who started with a Q-LES-Q baseline within community norm (ie. greater than 66)
+        if baseline >= 67:
+            continue
+
+        assert baseline < 67, f"Patient {subject} starting with baseline Quality of Life that is already within 1SD of community norm (>= 67)"
             
         week8 = group[group['EVENTNAME'] == 'Week 8']['transformed_qlesq'].values[0]
         week8_max_raw = group[group['EVENTNAME'] == 'Week 8']['max_raw_total'].values[0]

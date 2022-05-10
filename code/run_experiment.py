@@ -281,7 +281,7 @@ def main(x_data: str, y_data: str):
     print(exp_1.avg_results)
     print(exp_1.std_results)
 
-    exp_1.store_results(EXPERIMENT_RESULTS, "overlap_results_77")
+    exp_1.store_results(EXPERIMENT_RESULTS, "over_77_criteria_updated")
 
     
 

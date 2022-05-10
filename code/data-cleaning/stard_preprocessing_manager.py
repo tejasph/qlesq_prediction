@@ -1190,6 +1190,10 @@ def generate_qlesq_y(root_data_dir_path, output_name,  days_baseline_cutoff = 77
         if end_day <= 21 or end_day >= days_baseline_cutoff:
             continue
 
+        # Exclude patients who started with a Q-LES-Q baseline within community norm (ie. greater than 66)
+        if baseline >= 67:
+            continue
+
         assert sorted_data['totqlesq'].isna().sum() == 0, f"Total Qlesq has {sorted_data['totqlesq'].isna().sum()} NA values for {subject_id}"
         assert sorted_data.duplicated().sum() == 0, f"Duplicate rows detected for {subject_id}"
         assert sorted_data.shape[0] >= 2, f"Subject profile has 1 row or less, for {subject_id}"
@@ -1197,6 +1201,7 @@ def generate_qlesq_y(root_data_dir_path, output_name,  days_baseline_cutoff = 77
         assert end_day >= 21, f"End day found to be earlier than Week 4 (21 days), for {subject_id}"
         assert start_day <= 21, f"Start day found to be later than Week 4 (21 days), for {subject_id}"
         assert end_lvl != "Level 3" and end_lvl != "Level 4", f"Invalid levels for {subject_id}"
+        assert baseline < 67, f"Patient {subject_id} starting with baseline Quality of Life that is already within 1SD of community norm (>= 67)"
         # if end_lvl == "Level 2" or end_lvl == "Follow up":
         #     assert end_type == "Entry" or end_type == "Base", f"Incorrect Call type () for a level 2 or follow-up score, for {subject}"
         assert pd.isna(end_lvl) == False, f"End level is NA for {subject_id}"

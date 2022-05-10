@@ -8,7 +8,7 @@ import typer
 import os
 
 # Import paths
-from globals import DATA_MODELLING_FOLDER, EVALUATION_RESULTS, full_feat_models, overlapping_feat_models
+from globals import DATA_MODELLING_FOLDER, EVALUATION_RESULTS, full_feat_models, overlapping_feat_models, full_feat_models_rfe
 
 # Import sklearn processing/pipeline
 from sklearn.pipeline import Pipeline
@@ -234,7 +234,7 @@ def main(eval_type : str, eval_name : str):
 
     startTime = datetime.datetime.now()
 
-    assert eval_type in ['full', 'over', 'canbind'], "eval_type (1st argument) was not valid. The only 3 options are 'full', 'over', and 'canbind'."
+    assert eval_type in ['full', 'full_rfe', 'over', 'canbind'], "eval_type (1st argument) was not valid. The only 3 options are 'full', 'over', and 'canbind'."
 
     if eval_type == "full": 
         x_train_data = "X_train_77"
@@ -243,6 +243,14 @@ def main(eval_type : str, eval_name : str):
         y_test_data = "y_test_77"
 
         models = full_feat_models
+
+    elif eval_type == "full_rfe":
+        x_train_data = "X_train_77_rfe"
+        y_train_data = "y_train_77"
+        x_test_data = "X_test_77_rfe"
+        y_test_data = "y_test_77"
+
+        models = full_feat_models_rfe
 
     elif eval_type == "over":
         x_train_data = "X_train_77_over"
