@@ -27,9 +27,11 @@ from sklearn.svm import SVC
 
 # Metrics
 from sklearn.metrics import balanced_accuracy_score
+from sklearn.metrics import accuracy_score
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import balanced_accuracy_score
 from sklearn.metrics import roc_auc_score
+from sklearn.metrics import f1_score
 from sklearn.metrics import confusion_matrix
 
 class evaluation_manager():
@@ -81,12 +83,14 @@ class evaluation_manager():
         train_auc = roc_auc_score(self.y_train, y_train_score)
         test_auc = roc_auc_score(self.y_test, y_test_score)
 
-        # Obtain training sensitivity, specificity, PPV/precision, and NPV
+        # Obtain training sensitivity/recall, specificity, PPV/precision, and NPV
         train_tn, train_fp, train_fn, train_tp = confusion_matrix(self.y_train, training_predictions).ravel()
         train_spec = train_tn/(train_tn + train_fp)
         train_sens = train_tp/(train_tp + train_fn)
         train_prec = train_tp/(train_tp + train_fp)
         train_npv = train_tn/(train_tn + train_fn)
+        train_f1 = f1_score(self.y_train, training_predictions)
+        
 
         # Obtain validation sensitivity, specificity, PPV/precision, and NPV
         test_tn, test_fp, test_fn, test_tp = confusion_matrix(self.y_test, test_predictions).ravel()
@@ -94,10 +98,14 @@ class evaluation_manager():
         test_sens = test_tp/(test_tp + test_fn)
         test_prec = test_tp/(test_tp + test_fp)
         test_npv = test_tn/(test_tn + test_fn)
+        test_f1 = f1_score(self.y_test, test_predictions)
 
         # Store scores for the current split
         train_bal_acc = balanced_accuracy_score(self.y_train, training_predictions)
         test_bal_acc = balanced_accuracy_score(self.y_test, test_predictions)
+
+        train_acc = accuracy_score(self.y_train, training_predictions)
+        test_acc = accuracy_score(self.y_test, test_predictions)
 
         # Feature Importances 
         print(pipe_model.steps[1][1])
@@ -109,7 +117,7 @@ class evaluation_manager():
             FI = pipe_model.steps[1][1].feature_importances_.flatten()
         else: raise Exception("model_name doesn't match options for FI")
 
-        return train_bal_acc, train_auc, train_sens, train_spec, train_prec, train_npv, test_bal_acc, test_auc, test_sens, test_spec, test_prec, test_npv, FI
+        return train_bal_acc, train_acc, train_auc, train_tp, train_tn, train_fp, train_fn, train_sens, train_spec, train_prec, train_npv, train_f1, test_bal_acc, test_acc, test_auc, test_tp, test_tn, test_fp, test_fn, test_sens, test_spec, test_prec, test_npv, test_f1, FI
 
     def process_feature_importances(self, FI_array, model_name):
  
@@ -124,20 +132,20 @@ class evaluation_manager():
         
         assert len(self.models) >= 1, "No models to run test for!"
         exp_results = {'model':[], 
-       'avg_train_bal_acc':[], 'avg_train_auc':[], 'avg_train_sens':[], 'avg_train_spec':[], 'avg_train_ppv':[], 'avg_train_npv':[],
-      'avg_test_bal_acc':[], 'avg_test_auc':[], 'avg_test_sens':[], 'avg_test_spec':[], 'avg_test_ppv':[], 'avg_test_npv':[]}
+       'avg_train_bal_acc':[], 'avg_train_acc':[], 'avg_train_auc':[],'avg_train_tp':[], 'avg_train_tn':[], 'avg_train_fp':[], 'avg_train_fn':[], 'avg_train_sens':[], 'avg_train_spec':[], 'avg_train_ppv':[],'avg_train_npv':[], 'avg_train_f1':[],
+      'avg_test_bal_acc':[], 'avg_test_acc':[], 'avg_test_auc':[], 'avg_test_tp':[], 'avg_test_tn':[], 'avg_test_fp':[], 'avg_test_fn':[], 'avg_test_sens':[], 'avg_test_spec':[], 'avg_test_ppv':[], 'avg_test_npv':[], 'avg_test_f1':[]}
 
         std_results = {'model':[], 
-       'std_train_bal_acc':[], 'std_train_auc':[], 'std_train_sens':[], 'std_train_spec':[], 'std_train_ppv':[], 'std_train_npv':[],
-      'std_test_bal_acc':[], 'std_test_auc':[], 'std_test_sens':[], 'std_test_spec':[], 'std_test_ppv':[], 'std_test_npv':[]}
+       'std_train_bal_acc':[],'std_train_acc':[], 'std_train_auc':[],'std_train_tp':[], 'std_train_tn':[], 'std_train_fp':[], 'std_train_fn':[], 'std_train_sens':[], 'std_train_spec':[], 'std_train_ppv':[], 'std_train_npv':[], 'std_train_f1':[],
+      'std_test_bal_acc':[], 'std_test_acc':[], 'std_test_auc':[], 'std_test_tp':[], 'std_test_tn':[], 'std_test_fp':[], 'std_test_fn':[], 'std_test_sens':[], 'std_test_spec':[], 'std_test_ppv':[], 'std_test_npv':[], 'std_test_f1':[]}
         
         for model_name, model in self.models.items():
             #print(f"Running {model_name}")
             run = 1
             # Track run results
             runs_dict = {'run':[], 
-                      'train_bal_acc':[],'train_auc':[],'train_sens':[], 'train_spec': [], 'train_ppv':[], 'train_npv':[],
-                      'test_bal_acc':[], 'test_auc':[], 'test_sens':[], 'test_spec':[], 'test_ppv':[], 'test_npv':[]}
+                      'train_bal_acc':[],'train_acc':[], 'train_auc':[],'train_tp':[], 'train_tn':[], 'train_fp':[], 'train_fn':[], 'train_sens':[], 'train_spec': [], 'train_ppv':[], 'train_npv':[], 'train_f1':[],
+                      'test_bal_acc':[],'test_acc':[], 'test_auc':[], 'test_tp':[], 'test_tn':[], 'test_fp':[], 'test_fn':[], 'test_sens':[],'test_sens':[], 'test_spec':[], 'test_ppv':[], 'test_npv':[], 'test_f1':[]}
 
             # Will track feat importances across runs
             feat_importances = np.zeros(len(self.X_train.columns))
@@ -153,24 +161,37 @@ class evaluation_manager():
                 run_results = self.eval_run(pipe, model_name)
                 
                 # Unloading tuple in order of: 
-                # avg_t_bal_acc, avg_t_auc ,avg_t_sens, avg_t_spec, avg_t_prec, avg_t_npv, (0-5)
-                # avg_v_bal_acc, avg_v_auc, avg_v_sens, avg_v_spec, avg_v_prec, avg_v_npv (6-11)
+                # avg_t_bal_acc, avg_t_auc ,avg_t_sens, avg_t_spec, avg_t_prec, avg_t_npv, (0-7)
+                # avg_v_bal_acc, avg_v_auc, avg_v_sens, avg_v_spec, avg_v_prec, avg_v_npv (8-15)
+                # feature importance (16)
                 
                 runs_dict['train_bal_acc'].append(run_results[0])
-                runs_dict['train_auc'].append(run_results[1])
-                runs_dict['train_sens'].append(run_results[2])
-                runs_dict['train_spec'].append(run_results[3])
-                runs_dict['train_ppv'].append(run_results[4])
-                runs_dict['train_npv'].append(run_results[5])
+                runs_dict['train_acc'].append(run_results[1])
+                runs_dict['train_auc'].append(run_results[2])
+                runs_dict['train_tp'].append(run_results[3])
+                runs_dict['train_tn'].append(run_results[4])
+                runs_dict['train_fp'].append(run_results[5])
+                runs_dict['train_fn'].append(run_results[6])
+                runs_dict['train_sens'].append(run_results[7])
+                runs_dict['train_spec'].append(run_results[8])
+                runs_dict['train_ppv'].append(run_results[9])
+                runs_dict['train_npv'].append(run_results[10])
+                runs_dict['train_f1'].append(run_results[11])
 
-                runs_dict['test_bal_acc'].append(run_results[6])
-                runs_dict['test_auc'].append(run_results[7])
-                runs_dict['test_sens'].append(run_results[8])
-                runs_dict['test_spec'].append(run_results[9])
-                runs_dict['test_ppv'].append(run_results[10])
-                runs_dict['test_npv'].append(run_results[11])
+                runs_dict['test_bal_acc'].append(run_results[12])
+                runs_dict['test_acc'].append(run_results[13])
+                runs_dict['test_auc'].append(run_results[14])
+                runs_dict['test_tp'].append(run_results[15])
+                runs_dict['test_tn'].append(run_results[16])
+                runs_dict['test_fp'].append(run_results[17])
+                runs_dict['test_fn'].append(run_results[18])
+                runs_dict['test_sens'].append(run_results[19])
+                runs_dict['test_spec'].append(run_results[20])
+                runs_dict['test_ppv'].append(run_results[21])
+                runs_dict['test_npv'].append(run_results[22])
+                runs_dict['test_f1'].append(run_results[23])
 
-                feat_importances += run_results[12]
+                feat_importances += run_results[24]
 
                 run +=1
 
@@ -179,33 +200,58 @@ class evaluation_manager():
             # Calculate avg scores across all runs
             exp_results['model'].append(model_name)
             exp_results['avg_train_bal_acc'].append(runs_df['train_bal_acc'].mean())
+            exp_results['avg_train_acc'].append(runs_df['train_acc'].mean())
             exp_results['avg_train_auc'].append(runs_df['train_auc'].mean())
+            exp_results['avg_train_tp'].append(runs_df['train_tp'].mean())
+            exp_results['avg_train_tn'].append(runs_df['train_tn'].mean())
+            exp_results['avg_train_fp'].append(runs_df['train_fp'].mean())
+            exp_results['avg_train_fn'].append(runs_df['train_fn'].mean())
             exp_results['avg_train_sens'].append(runs_df['train_sens'].mean())
             exp_results['avg_train_spec'].append(runs_df['train_spec'].mean())
             exp_results['avg_train_ppv'].append(runs_df['train_ppv'].mean())
             exp_results['avg_train_npv'].append(runs_df['train_npv'].mean())
+            exp_results['avg_train_f1'].append(runs_df['train_f1'].mean())
 
             exp_results['avg_test_bal_acc'].append(runs_df['test_bal_acc'].mean())
+            exp_results['avg_test_acc'].append(runs_df['test_acc'].mean())
             exp_results['avg_test_auc'].append(runs_df['test_auc'].mean())
+            exp_results['avg_test_tp'].append(runs_df['test_tp'].mean())
+            exp_results['avg_test_tn'].append(runs_df['test_tn'].mean())
+            exp_results['avg_test_fp'].append(runs_df['test_fp'].mean())
+            exp_results['avg_test_fn'].append(runs_df['test_fn'].mean())
             exp_results['avg_test_sens'].append(runs_df['test_sens'].mean())
             exp_results['avg_test_spec'].append(runs_df['test_spec'].mean())
             exp_results['avg_test_ppv'].append(runs_df['test_ppv'].mean())
             exp_results['avg_test_npv'].append(runs_df['test_npv'].mean())
+            exp_results['avg_test_f1'].append(runs_df['test_f1'].mean())
 
+            # Calculate avg standard deviations across all runs
             std_results['model'].append(model_name)
             std_results['std_train_bal_acc'].append(runs_df['train_bal_acc'].std())
+            std_results['std_train_acc'].append(runs_df['train_acc'].std())
             std_results['std_train_auc'].append(runs_df['train_auc'].std())
+            std_results['std_train_tp'].append(runs_df['train_tp'].std())
+            std_results['std_train_tn'].append(runs_df['train_tn'].std())
+            std_results['std_train_fp'].append(runs_df['train_fp'].std())
+            std_results['std_train_fn'].append(runs_df['train_fn'].std())
             std_results['std_train_sens'].append(runs_df['train_sens'].std())
             std_results['std_train_spec'].append(runs_df['train_spec'].std())
             std_results['std_train_ppv'].append(runs_df['train_ppv'].std())
             std_results['std_train_npv'].append(runs_df['train_npv'].std())
+            std_results['std_train_f1'].append(runs_df['train_f1'].std())
 
             std_results['std_test_bal_acc'].append(runs_df['test_bal_acc'].std())
+            std_results['std_test_acc'].append(runs_df['test_acc'].std())
             std_results['std_test_auc'].append(runs_df['test_auc'].std())
+            std_results['std_test_tp'].append(runs_df['test_tp'].std())
+            std_results['std_test_tn'].append(runs_df['test_tn'].std())
+            std_results['std_test_fp'].append(runs_df['test_fp'].std())
+            std_results['std_test_fn'].append(runs_df['test_fn'].std())
             std_results['std_test_sens'].append(runs_df['test_sens'].std())
             std_results['std_test_spec'].append(runs_df['test_spec'].std())
             std_results['std_test_ppv'].append(runs_df['test_ppv'].std())
             std_results['std_test_npv'].append(runs_df['test_npv'].std())
+            std_results['std_test_f1'].append(runs_df['test_f1'].std())
 
             self.process_feature_importances(feat_importances, model_name)
 
