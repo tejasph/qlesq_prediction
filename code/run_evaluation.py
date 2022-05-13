@@ -4,6 +4,7 @@
 import pandas as pd
 import numpy as np
 import datetime
+import pickle
 import typer
 import os
 
@@ -53,15 +54,19 @@ class evaluation_manager():
         self.eval_name = eval_name
 
         self.out_path = os.path.join(self.results_path, self.eval_name)
+        self.model_path = self.out_path + "/models/"
 
         if os.path.isdir(self.out_path):
             raise Exception("Name already exists")
         else:
             os.mkdir(self.out_path + "/")
+
+        
+        os.mkdir(self.out_path + "/models/")
         
 
         
-    def eval_run(self, pipe_model, model_name):    
+    def eval_run(self, pipe_model, model_name, run):    
         """
         Evaluates prepare pipeline model
 
@@ -117,6 +122,9 @@ class evaluation_manager():
             FI = pipe_model.steps[1][1].feature_importances_.flatten()
         else: raise Exception("model_name doesn't match options for FI")
 
+        # Store model
+        pickle.dump(pipe_model, open(self.model_path + "/" + model_name + "_" + str(run), 'wb'))
+
         return train_bal_acc, train_acc, train_auc, train_tp, train_tn, train_fp, train_fn, train_sens, train_spec, train_prec, train_npv, train_f1, test_bal_acc, test_acc, test_auc, test_tp, test_tn, test_fp, test_fn, test_sens, test_spec, test_prec, test_npv, test_f1, FI
 
     def process_feature_importances(self, FI_array, model_name):
@@ -158,7 +166,7 @@ class evaluation_manager():
 
                 runs_dict['run'].append(run)
 
-                run_results = self.eval_run(pipe, model_name)
+                run_results = self.eval_run(pipe, model_name, run)
                 
                 # Unloading tuple in order of: 
                 # avg_t_bal_acc, avg_t_auc ,avg_t_sens, avg_t_spec, avg_t_prec, avg_t_npv, (0-7)
