@@ -8,6 +8,7 @@ import datetime
 from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
@@ -155,6 +156,24 @@ def main(x_data: str, y_data: str):
 
 ######
 
+##### GBDT grid search
+    gbdt =('gbdt', GradientBoostingClassifier()) 
+    gbdt_params = {'gbdt__learning_rate':[0.1, 1, 10 ],
+                'gbdt__n_estimators':[10, 100],
+                'gbdt__max_depth': [2,3,4,5],
+                'gbdt__subsample': [0.7, 0.9, 1.0],
+                'gbdt__max_features':[ 'sqrt', 'log2', None]}
+
+    gbdt_pipe = get_scaled_pipeline(gbdt)
+
+    optimizer = model_optimizer(gbdt_pipe, gbdt_params, X, y, x_data, y_data, "gbdt_full_broad_grid")
+
+    optimizer.search_grid()
+
+    optimizer.write_results()
+
+#####
+
 ############################################################################################## 
 # Optimizing Overlapping feature models
 ##############################################################################################
@@ -237,18 +256,18 @@ def main(x_data: str, y_data: str):
 ################################################################################################################
 
 ###### RF grid search
-    rf =('rf', RandomForestClassifier(n_estimators = 100, class_weight = 'balanced')) 
-    rf_params = {'rf__max_features': ['sqrt', 'log2', 0.33, 0.2, 0.1],
-            'rf__max_depth': [int(x) for x in np.linspace(2, 100, num = 10)],
-            'rf__criterion':['gini', 'entropy']}
+    # rf =('rf', RandomForestClassifier(n_estimators = 100, class_weight = 'balanced')) 
+    # rf_params = {'rf__max_features': ['sqrt', 'log2', 0.33, 0.2, 0.1],
+    #         'rf__max_depth': [int(x) for x in np.linspace(2, 100, num = 10)],
+    #         'rf__criterion':['gini', 'entropy']}
 
-    rf_pipe = get_scaled_pipeline(rf)
+    # rf_pipe = get_scaled_pipeline(rf)
 
-    optimizer = model_optimizer(rf_pipe, rf_params, X, y,x_data, y_data, "rf_full_rfe")
+    # optimizer = model_optimizer(rf_pipe, rf_params, X, y,x_data, y_data, "rf_full_rfe")
 
-    optimizer.search_grid()
+    # optimizer.search_grid()
 
-    optimizer.write_results()
+    # optimizer.write_results()
 
 ######
 

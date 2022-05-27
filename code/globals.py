@@ -1,6 +1,7 @@
 #globals
 # Models
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.dummy import DummyClassifier
@@ -13,12 +14,15 @@ EXPERIMENT_RESULTS = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\r
 EVALUATION_RESULTS = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations"
 
 
+# Excellent article on class imbalance management in GBDT (https://towardsdatascience.com/practical-tips-for-class-imbalance-in-binary-classification-6ee29bcdb8a7)
+
 # Full  Variables
 full_feat_models = {'Dummy_Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
       'Random_Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
       'Logistic_Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.096, tol = 0.1, l1_ratio = 0.8)),
       'KNearest_Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 15, p = 1, weights = 'uniform')),
-      'Support_Vector_Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'auto', probability = True))}
+      'Support_Vector_Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'auto', probability = True)),
+      'Gradient Boosting Classifier': ('gbdt', GradientBoostingClassifier(max_features = 'sqrt'))}
 
 
 

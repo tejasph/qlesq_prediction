@@ -118,7 +118,7 @@ class evaluation_manager():
             FI = np.zeros(len(self.X_train.columns))
         elif model_name == 'Logistic_Regression':
             FI = pipe_model.steps[1][1].coef_.flatten()
-        elif model_name == 'Random_Forest':
+        elif model_name == 'Random_Forest' or model_name == 'Gradient Boosting Classifier':
             FI = pipe_model.steps[1][1].feature_importances_.flatten()
         else: raise Exception("model_name doesn't match options for FI")
 
