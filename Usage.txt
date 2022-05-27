@@ -38,11 +38,22 @@ python code/train_test_split.py X_77_qlesq_sr__final_extval.csv y_qlesq_77__fina
 
 python code/train_test_split.py X_77_qlesq_sr__final.csv y_qlesq_77__final__targets.csv 
 
-7) Optional: Running a GridSearch (before running, check parameter grids and names within the script)
+7) Optional: Running a GridSearch (before running, check parameter grids and adjust as needed)
 
-Manually adjust grid_search.py for model of interest and params to explore
 
-python code/grid_search.py X_train_77 y_train_77 (input data you want to optimize for)
+python code/grid_search.py [model_type] [data_type] 
+
+model_type has several options:
+- rf --> random forest
+- lr --> logistic regression
+- gbdt --> gradient boosting classifiers
+- svc  --> support vector classifier
+- knn --> k nearest neighbors
+
+data_type has 3 options:
+- full --> full feature set (480)
+- over --> overlapping feature set (100)
+- rfe --> recursive feature elimination set
 
 
 8) Running an experiment:

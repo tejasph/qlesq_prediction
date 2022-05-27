@@ -53,9 +53,59 @@ def get_scaled_pipeline(model):
     return Pipeline([('scaler', MinMaxScaler()), model])
         
 
-def main(x_data: str, y_data: str):
+def main(model_type: str, feat_type: str):
 
     startTime = datetime.datetime.now()
+
+    # Establishing the model parameters
+    if model_type == "rf":
+        model = ('rf', RandomForestClassifier(n_estimators = 100, class_weight = 'balanced')) 
+        model_params = {'rf__max_features': ['sqrt', 'log2', 0.33, 0.2, 0.1],
+            'rf__max_depth': [int(x) for x in np.linspace(2, 100, num = 10)],
+            'rf__min_samples_split': [2,4,6,8,10],
+            'rf__min_samples_leaf': [1,2,3,4,5],
+            'rf__min_impurity_decrease': [0.0, 0.1, 0.3],
+            'rf__criterion':['gini', 'entropy']}
+
+    elif model_type == 'lr':
+        model = ('lr', LogisticRegression(penalty = 'l2', class_weight = 'balanced', solver = 'liblinear'))
+        model_params = {'lr__tol' : [0.1, 0.01, 0.001, 'none'],
+                    'lr__C': [p/1000 for p in range(90, 120, 1)],
+                    'lr__penalty': ['l1', 'l2']}
+
+    elif model_type == "svc":
+        model = ('svc', SVC(class_weight = 'balanced'))
+        model_params = {'svc__gamma': ['scale', 'auto'],
+                'svc__C':[0.001, 0.01, 0.1, 1, 10, 100, 1000]}
+    
+    elif model_type == "knn":
+        model = ('knn', KNeighborsClassifier())
+        model_params = {'knn__n_neighbors': [n for n in range(1,31, 2)],
+                'knn__weights': ['uniform', 'distance'], 
+                'knn__p': [1,2]}
+    
+    elif model_type == "gbdt":
+        model =('gbdt', GradientBoostingClassifier()) 
+        model_params = {'gbdt__learning_rate':[0.1, 1, 10 ],
+                'gbdt__n_estimators':[10, 100],
+                'gbdt__max_depth': [2,3,4,5],
+                'gbdt__subsample': [0.7, 0.9, 1.0],
+                'gbdt__max_features':[ 'sqrt', 'log2', None]}
+    
+    else: raise Exception("model_type doesn't match options. Choose: rf, lr, svc, knn, or gbdt")
+    
+    
+
+    if feat_type == "full":
+        x_data = "X_train_77"
+    elif feat_type == "over":
+        x_data = "X_train_77_over"
+    elif feat_type == "rfe":
+        x_data = "X_train_77_rfe"
+    else: raise Exception("feat_type doesn't match options for FI. Choose: full, over, or rfe")
+
+    y_data = "y_train_77"
+
 
     x_path = os.path.join(DATA_MODELLING_FOLDER, x_data)
     y_path = os.path.join(DATA_MODELLING_FOLDER, y_data)
@@ -65,6 +115,16 @@ def main(x_data: str, y_data: str):
 
 
     y.columns = ['target']
+
+    # Run the Grid Search
+
+    pipe = get_scaled_pipeline(model)
+
+    optimizer = model_optimizer(pipe, model_params, X, y,x_data, y_data, model_type + "_" + feat_type)
+
+    optimizer.search_grid()
+
+    optimizer.write_results()
 
 ###### RF grid search
     # rf =('rf', RandomForestClassifier(n_estimators = 100, class_weight = 'balanced')) 
