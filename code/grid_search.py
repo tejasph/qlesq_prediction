@@ -102,6 +102,8 @@ def main(model_type: str, feat_type: str):
         x_data = "X_train_77_over"
     elif feat_type == "rfe":
         x_data = "X_train_77_rfe"
+    elif feat_type == "enet":
+        x_data = "X_train_77_enet"
     else: raise Exception("feat_type doesn't match options for FI. Choose: full, over, or rfe")
 
     y_data = "y_train_77"
@@ -217,20 +219,20 @@ def main(model_type: str, feat_type: str):
 ######
 
 ##### GBDT grid search
-    gbdt =('gbdt', GradientBoostingClassifier()) 
-    gbdt_params = {'gbdt__learning_rate':[0.1, 1, 10 ],
-                'gbdt__n_estimators':[10, 100],
-                'gbdt__max_depth': [2,3,4,5],
-                'gbdt__subsample': [0.7, 0.9, 1.0],
-                'gbdt__max_features':[ 'sqrt', 'log2', None]}
+    # gbdt =('gbdt', GradientBoostingClassifier()) 
+    # gbdt_params = {'gbdt__learning_rate':[0.1, 1, 10 ],
+    #             'gbdt__n_estimators':[10, 100],
+    #             'gbdt__max_depth': [2,3,4,5],
+    #             'gbdt__subsample': [0.7, 0.9, 1.0],
+    #             'gbdt__max_features':[ 'sqrt', 'log2', None]}
 
-    gbdt_pipe = get_scaled_pipeline(gbdt)
+    # gbdt_pipe = get_scaled_pipeline(gbdt)
 
-    optimizer = model_optimizer(gbdt_pipe, gbdt_params, X, y, x_data, y_data, "gbdt_full_broad_grid")
+    # optimizer = model_optimizer(gbdt_pipe, gbdt_params, X, y, x_data, y_data, "gbdt_full_broad_grid")
 
-    optimizer.search_grid()
+    # optimizer.search_grid()
 
-    optimizer.write_results()
+    # optimizer.write_results()
 
 #####
 

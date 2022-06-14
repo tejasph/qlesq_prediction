@@ -74,10 +74,14 @@ Optional Scripts:
 
 a) RFE Selection
 
-There are three options for eval type:
+There are two options for eval type:
 - Full features   (eval_type ="full")
 - Overlapping features  (eval_type = "over")
 
 
 Usage: python code/rfe_selection.py [eval_type] [rfe_step] [n_feats to select]
 ex. python code/rfe_selection.py full 1 30
+
+b) Elastic Net Selection
+
+
