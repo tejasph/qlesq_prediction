@@ -288,7 +288,7 @@ def main(eval_type : str, eval_name : str):
 
     startTime = datetime.datetime.now()
 
-    assert eval_type in ['full', 'full_rfe', 'over', 'canbind'], "eval_type (1st argument) was not valid. The only 3 options are 'full', 'over', and 'canbind'."
+    assert eval_type in ['full', 'full_enet', 'full_rfe', 'over', 'canbind'], "eval_type (1st argument) was not valid. The only 3 options are 'full', 'over', and 'canbind'."
 
     if eval_type == "full": 
         x_train_data = "X_train_77"
@@ -296,7 +296,15 @@ def main(eval_type : str, eval_name : str):
         x_test_data = "X_test_77"
         y_test_data = "y_test_77"
 
-        models = full_feat_models
+        models = full_feat_models # these are optimized models discovered in GridSearchCV and are all stored in globals.py
+
+    elif eval_type == "full_enet":
+        x_train_data = "X_train_77_enet"
+        y_train_data = "y_train_77"
+        x_test_data = "X_test_77_enet"
+        y_test_data = "y_test_77"
+
+        models = full_feat_models # haven't done Grid search on this yet so just use default full models
 
     elif eval_type == "full_rfe":
         x_train_data = "X_train_77_rfe"

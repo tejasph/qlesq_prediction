@@ -54,9 +54,10 @@ data_type has 3 options:
 - full --> full feature set (480)
 - over --> overlapping feature set (100)
 - rfe --> recursive feature elimination set
+- enet --> elastic net CV feature selection
 
 
-8) Running an experiment:
+8) Running an experiment: (can't remember if this is redundant or not...)
 
 Experiments are run via run_experiment.py. It utilizes classes so code in main() will need to be altered to contain models of your choice. The type of data is given as arguements to main().
 
