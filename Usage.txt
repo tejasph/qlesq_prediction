@@ -65,6 +65,8 @@ Experiments are run via run_experiment.py. It utilizes classes so code in main()
 
 There are three options:
 - Full feature evalution on STARD holdout   (eval_type ="full")
+- Full fetaures w/ enet selection (eval_type = "full_enet")
+- Full features w/ recursive elimination selection (eval_type = "full_rfe")
 - Overlapping feature evaluation on STARD holdout (eval_type = "over")
 - Overlapping feature evaluation on CANBIND holdout (eval_type = "canbind")
 
@@ -77,6 +79,7 @@ a) RFE Selection
 
 There are two options for eval type:
 - Full features   (eval_type ="full")
+
 - Overlapping features  (eval_type = "over")
 
 
