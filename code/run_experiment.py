@@ -9,6 +9,7 @@ import os
 
 # Import paths
 from globals import DATA_MODELLING_FOLDER, EXPERIMENT_RESULTS
+from globals import full_feat_models, full_enet_feat_models
 
 # Import sklearn processing/pipeline
 from sklearn.pipeline import Pipeline
@@ -247,12 +248,36 @@ class experiment_manager():
 
 
 
-def main(x_data: str, y_data: str):
+def main(eval_type: str, eval_name: str):
 
     startTime = datetime.datetime.now()
+  
+    assert eval_type in ['full', 'full_enet', 'over', 'over_enet'], "eval_type (1st argument) was not valid. The only 3 options are 'full', 'over', and 'canbind'."
+
+    if eval_type == "full": 
+        x_data = "X_train_77"
+        models = full_feat_models # these are optimized models discovered in GridSearchCV and are all stored in globals.py
+
+    elif eval_type == "full_enet":
+        x_data = "X_train_77_enet"
+
+        models = full_enet_feat_models # haven't done Grid search on this yet so just use default full models
+
+    elif eval_type == "over":
+        x_data = "X_train_77_over"
+
+        models = overlapping_feat_models
+    
+    elif eval_type == "over_enet":
+        x_data = "X_train_77_over_enet"
+        models = overlapping_enet_feat_models
+
+    y_data = "y_train_77"
 
     x_path = os.path.join(DATA_MODELLING_FOLDER, x_data)
     y_path = os.path.join(DATA_MODELLING_FOLDER, y_data)
+
+
    
     X = pd.read_csv(x_path + ".csv")
     y = pd.read_csv(y_path + ".csv")
@@ -262,6 +287,8 @@ def main(x_data: str, y_data: str):
 
     exp_1 = experiment_manager(X, y, x_data, y_data)
 
+    exp_1.models = models
+
     # full Feature models
     # exp_1.models = {'Dummy Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
     #       'Random Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
@@ -270,18 +297,18 @@ def main(x_data: str, y_data: str):
     #       'Support Vector Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'auto', probability = True) )}
 
     # Overlapping models
-    exp_1.models = {'Dummy Classification': ('dummy', DummyClassifier(strategy = 'stratified')),
-                    'Logistic Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.091, tol = 0.1, l1_ratio = 0.9)),
-                    'Random Forest' :('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
-                    'KNearest Neighbors' :('knn', KNeighborsClassifier(n_neighbors = 1, p = 1, weights = 'uniform')),
-                    'SVC' :('svc', SVC(class_weight = 'balanced', C= 1, gamma= 'scale', probability = True))}
+    # exp_1.models = {'Dummy Classification': ('dummy', DummyClassifier(strategy = 'stratified')),
+    #                 'Logistic Regression': ('lr', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', max_iter = 1000,  C = 0.091, tol = 0.1, l1_ratio = 0.9)),
+    #                 'Random Forest' :('rf', RandomForestClassifier(class_weight = 'balanced', max_depth = 2, max_features = 'sqrt')),
+    #                 'KNearest Neighbors' :('knn', KNeighborsClassifier(n_neighbors = 1, p = 1, weights = 'uniform')),
+    #                 'SVC' :('svc', SVC(class_weight = 'balanced', C= 1, gamma= 'scale', probability = True))}
 
     exp_1.run_experiment()
 
     print(exp_1.avg_results)
     print(exp_1.std_results)
 
-    exp_1.store_results(EXPERIMENT_RESULTS, "over_77_criteria_updated")
+    exp_1.store_results(EXPERIMENT_RESULTS, eval_name)
 
     
 
