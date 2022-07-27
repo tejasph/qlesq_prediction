@@ -9,7 +9,7 @@ import typer
 import os
 
 # Import paths
-from globals import DATA_MODELLING_FOLDER, EVALUATION_RESULTS, full_feat_models, overlapping_feat_models, full_feat_models_rfe
+from globals import DATA_MODELLING_FOLDER, EVALUATION_RESULTS, full_feat_models, overlapping_feat_models, full_enet_feat_models, overlapping_enet_feat_models
 
 # Import sklearn processing/pipeline
 from sklearn.pipeline import Pipeline
@@ -288,7 +288,7 @@ def main(eval_type : str, eval_name : str):
 
     startTime = datetime.datetime.now()
 
-    assert eval_type in ['full', 'full_enet', 'full_rfe', 'over', 'canbind'], "eval_type (1st argument) was not valid. The only 3 options are 'full', 'over', and 'canbind'."
+    assert eval_type in ['full', 'full_enet',  'over', 'over_enet', 'canbind', 'canbind_enet'], "eval_type (1st argument) was not valid. The only 3 options are 'full', 'over', and 'canbind'."
 
     if eval_type == "full": 
         x_train_data = "X_train_77"
@@ -304,15 +304,15 @@ def main(eval_type : str, eval_name : str):
         x_test_data = "X_test_77_enet"
         y_test_data = "y_test_77"
 
-        models = full_feat_models # haven't done Grid search on this yet so just use default full models
+        models = full_enet_feat_models
 
-    elif eval_type == "full_rfe":
-        x_train_data = "X_train_77_rfe"
-        y_train_data = "y_train_77"
-        x_test_data = "X_test_77_rfe"
-        y_test_data = "y_test_77"
+    # elif eval_type == "full_rfe":
+    #     x_train_data = "X_train_77_rfe"
+    #     y_train_data = "y_train_77"
+    #     x_test_data = "X_test_77_rfe"
+    #     y_test_data = "y_test_77"
 
-        models = full_feat_models_rfe
+    #     models = full_feat_models_rfe
 
     elif eval_type == "over":
         x_train_data = "X_train_77_over"
@@ -321,6 +321,14 @@ def main(eval_type : str, eval_name : str):
         y_test_data = "y_test_77"
 
         models = overlapping_feat_models
+    
+    elif eval_type == "over_enet":
+        x_train_data = "X_train_77_over_enet"
+        y_train_data = "y_train_77"
+        x_test_data = "X_test_77_over_enet"
+        y_test_data = "y_test_77"
+
+        models = overlapping_enet_feat_models
      
     elif eval_type == "canbind": # Need to pull in selected cols for enet version of assessment
         x_train_data = "X_77_qlesq_sr__final_extval"
@@ -330,6 +338,20 @@ def main(eval_type : str, eval_name : str):
         y_test_data = "canbind_qlesq_y__targets"
 
         models = overlapping_feat_models
+
+    elif eval_type == "canbind_enet":
+        x_train_data = "X_77_qlesq_sr__final_extval"
+        y_train_data = "y_qlesq_77__final__targets"
+
+        x_test_data = "X_test_cb_extval"
+        y_test_data = "canbind_qlesq_y__targets"
+
+        # Grab selected columns to reduce external validation dfs
+        enet_features = pd.read_csv( os.path.join(DATA_MODELLING_FOLDER, "X_train_77_over_enet") + ".csv").set_index('subjectkey').columns
+        print(len(enet_features))
+
+        models = overlapping_enet_feat_models
+
 
     x_train_path = os.path.join(DATA_MODELLING_FOLDER, x_train_data)
     y_train_path = os.path.join(DATA_MODELLING_FOLDER, y_train_data)
@@ -343,16 +365,21 @@ def main(eval_type : str, eval_name : str):
     y_test = pd.read_csv(y_test_path + ".csv").set_index('subjectkey')
 
     # Some processing was left out until the end for the canbind dataset
-    if eval_type == "canbind":
+    if eval_type == "canbind" or eval_type == "canbind_enet":
         
         # Drops 5 rows that weren't shared by both dfs. The discrepancy is due to selection criteria in canbind_ygen.py applied on the y df.
         X_test = X_test[X_test.index.isin(list(X_test.index.difference(y_test.index))) == False]
         y_test = y_test[y_test.index.isin(list(y_test.index.difference(X_test.index))) == False]
 
         # For feature selection, adjust canbind dataset to have only selected columns
-        if X_train.shape[1] != X_test.shape[1]:
-            selected_cols = X_train.columns
-            X_test = X_test[selected_cols]
+        # if X_train.shape[1] != X_test.shape[1]:
+        #     selected_cols = X_train.columns
+        #     X_test = X_test[selected_cols]
+        if eval_type == "canbind_enet":
+            X_train = X_train[enet_features]
+            X_test = X_test[enet_features]
+            print(X_train.shape)
+            print(X_test.shape)
 
         y_train = y_train[['qlesq_QoL_threshold']]
         y_test = y_test[['qlesq_QoL_threshold']]

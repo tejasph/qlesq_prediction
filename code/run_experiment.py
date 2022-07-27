@@ -28,10 +28,12 @@ from sklearn.svm import SVC
 
 # Metrics
 from sklearn.metrics import balanced_accuracy_score
+from sklearn.metrics import accuracy_score
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import balanced_accuracy_score
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import f1_score
 
 class experiment_manager():
     
@@ -56,8 +58,8 @@ class experiment_manager():
         cv = StratifiedKFold(n_splits = 10)
         j = 1
         scores = {'fold':[], 
-                  'train_bal_acc':[],'train_auc':[],'train_sens':[], 'train_spec': [], 'train_prec':[], 'train_npv':[],
-                  'valid_bal_acc':[], 'valid_auc':[], 'valid_sens':[], 'valid_spec':[], 'valid_prec':[], 'valid_npv': []}
+                  'train_bal_acc':[],'train_acc':[], 'train_auc':[],'train_tp':[], 'train_tn':[], 'train_fp':[], 'train_fn':[], 'train_sens':[], 'train_spec': [], 'train_prec':[], 'train_npv':[], 'train_f1':[],
+                  'valid_bal_acc':[],'valid_acc':[], 'valid_auc':[], 'valid_tp':[], 'valid_tn':[], 'valid_fp':[], 'valid_fn':[],  'valid_sens':[], 'valid_spec':[], 'valid_prec':[], 'valid_npv': [], 'valid_f1':[]}
         
         # For each cv split...
         for train_id, valid_id in cv.split(X, y.target):
@@ -90,6 +92,7 @@ class experiment_manager():
             train_sensitivity = t_tp/(t_tp+t_fn)
             train_precision = t_tp/(t_tp+t_fp)
             train_npv = t_tn/(t_tn + t_fn)
+            train_f1 = f1_score(y_train, training_predictions)
 
             # Obtain validation sensitivity, specificity, PPV/precision, and NPV
             v_tn, v_fp, v_fn, v_tp = confusion_matrix(y_valid,validation_predictions).ravel()
@@ -97,24 +100,40 @@ class experiment_manager():
             valid_sensitivity = v_tp/(v_tp + v_fn)
             valid_precision = v_tp/(v_tp + v_fp)
             valid_npv = v_tn/(v_tn + v_fn)
+            valid_f1 = f1_score(y_valid, validation_predictions)
             
             # Store scores for the current split
             scores['fold'].append(j)
             scores['train_bal_acc'].append(balanced_accuracy_score(y_train, training_predictions))
+            scores['train_acc'].append(accuracy_score(y_train, training_predictions))
+
             scores['valid_bal_acc'].append(balanced_accuracy_score(y_valid, validation_predictions))
+            scores['valid_acc'].append(accuracy_score(y_valid, validation_predictions))
 
             scores['train_auc'].append(train_roc)
             scores['valid_auc'].append(valid_roc)
+
+            scores['train_tp'].append(t_tp)
+            scores['train_tn'].append(t_tn)
+            scores['train_fp'].append(t_fp)
+            scores['train_fn'].append(t_fn)
+
+            scores['valid_tp'].append(v_tp)
+            scores['valid_tn'].append(v_tn)
+            scores['valid_fp'].append(v_fp)
+            scores['valid_fn'].append(v_fn)
 
             scores['train_sens'].append(train_sensitivity)
             scores['train_spec'].append(train_specificity)
             scores['train_prec'].append(train_precision)
             scores['train_npv'].append(train_npv)
+            scores['train_f1'].append(train_f1)
 
             scores['valid_sens'].append(valid_sensitivity)
             scores['valid_spec'].append(valid_specificity)
             scores['valid_prec'].append(valid_precision)
             scores['valid_npv'].append(valid_npv)
+            scores['valid_f1'].append(valid_f1)
 
             j += 1
 
@@ -122,21 +141,35 @@ class experiment_manager():
         score_df = pd.DataFrame(scores)
 
         avg_t_bal_acc = score_df.train_bal_acc.mean()
+        avg_t_acc = score_df.train_acc.mean()
+
         avg_v_bal_acc = score_df.valid_bal_acc.mean()
+        avg_v_acc = score_df.valid_acc.mean()
 
         avg_t_auc = score_df.train_auc.mean()
         avg_v_auc = score_df.valid_auc.mean()
 
+        avg_t_tp = score_df.train_tp.mean()
+        avg_t_tn = score_df.train_tn.mean()
+        avg_t_fp = score_df.train_fp.mean()
+        avg_t_fn = score_df.train_fn.mean()
         avg_t_sens = score_df.train_sens.mean()
         avg_t_spec = score_df.train_spec.mean()
         avg_t_prec = score_df.train_prec.mean()
         avg_t_npv = score_df.train_npv.mean()
+        avg_t_f1 = score_df.train_f1.mean()
+
+        avg_v_tp = score_df.valid_tp.mean()
+        avg_v_tn = score_df.valid_tn.mean()
+        avg_v_fp = score_df.valid_fp.mean()
+        avg_v_fn = score_df.valid_fn.mean()
         avg_v_sens = score_df.valid_sens.mean()
         avg_v_spec = score_df.valid_spec.mean()
         avg_v_prec = score_df.valid_prec.mean()
         avg_v_npv = score_df.valid_npv.mean()
+        avg_v_f1 = score_df.valid_f1.mean()
 
-        return avg_t_bal_acc, avg_t_auc ,avg_t_sens, avg_t_spec, avg_t_prec, avg_t_npv, avg_v_bal_acc, avg_v_auc, avg_v_sens, avg_v_spec, avg_v_prec, avg_v_npv
+        return avg_t_bal_acc, avg_t_acc, avg_t_auc, avg_t_tp, avg_t_tn, avg_t_fp, avg_t_fn, avg_t_sens, avg_t_spec, avg_t_prec, avg_t_npv, avg_t_f1,  avg_v_bal_acc, avg_v_acc, avg_v_auc, avg_v_tp, avg_v_tn, avg_v_fp, avg_v_fn, avg_v_sens, avg_v_spec, avg_v_prec, avg_v_npv, avg_v_f1
 
     
     def run_experiment(self):
@@ -144,20 +177,20 @@ class experiment_manager():
         
         assert len(self.models) >= 1, "No models to run test for!"
         exp_results = {'model':[], 
-       'avg_train_bal_acc':[], 'avg_train_auc':[], 'avg_train_sens':[], 'avg_train_spec':[], 'avg_train_ppv':[], 'avg_train_npv':[],
-      'avg_valid_bal_acc':[], 'avg_valid_auc':[], 'avg_valid_sens':[], 'avg_valid_spec':[], 'avg_valid_ppv':[], 'avg_valid_npv':[]}
+       'avg_train_bal_acc':[],'avg_train_acc':[],  'avg_train_auc':[], 'avg_train_tp':[], 'avg_train_tn':[], 'avg_train_fp':[], 'avg_train_fn':[], 'avg_train_sens':[], 'avg_train_spec':[], 'avg_train_ppv':[], 'avg_train_npv':[], 'avg_train_f1':[],
+      'avg_valid_bal_acc':[],'avg_valid_acc':[],  'avg_valid_auc':[], 'avg_valid_tp':[], 'avg_valid_tn':[], 'avg_valid_fp':[], 'avg_valid_fn':[], 'avg_valid_sens':[], 'avg_valid_spec':[], 'avg_valid_ppv':[], 'avg_valid_npv':[], 'avg_valid_f1':[]}
 
         std_results = {'model':[], 
-       'std_train_bal_acc':[], 'std_train_auc':[], 'std_train_sens':[], 'std_train_spec':[], 'std_train_ppv':[], 'std_train_npv':[],
-      'std_valid_bal_acc':[], 'std_valid_auc':[], 'std_valid_sens':[], 'std_valid_spec':[], 'std_valid_ppv':[], 'std_valid_npv':[]}
+       'std_train_bal_acc':[], 'std_train_acc':[],  'std_train_auc':[], 'std_train_tp':[], 'std_train_tn':[], 'std_train_fp':[], 'std_train_fn':[],  'std_train_sens':[], 'std_train_spec':[], 'std_train_ppv':[], 'std_train_npv':[], 'std_train_f1':[],
+      'std_valid_bal_acc':[],'std_valid_acc':[], 'std_valid_auc':[], 'std_valid_tp':[], 'std_valid_tn':[], 'std_valid_fp':[], 'std_valid_fn':[], 'std_valid_sens':[], 'std_valid_spec':[], 'std_valid_ppv':[], 'std_valid_npv':[], 'std_valid_f1':[]}
         
         for model_name, model in self.models.items():
             #print(f"Running {model_name}")
             run = 1
             # Track run results
             runs_dict = {'run':[], 
-                      't_bal_acc':[],'t_auc':[],'t_sens':[], 't_spec': [], 't_ppv':[], 't_npv':[],
-                      'v_bal_acc':[], 'v_auc':[], 'v_sens':[], 'v_spec':[], 'v_ppv':[], 'v_npv':[]}
+                      't_bal_acc':[],'t_acc':[], 't_auc':[], 't_tp':[], 't_tn':[], 't_fp':[], 't_fn':[], 't_sens':[], 't_spec': [], 't_ppv':[], 't_npv':[], 't_f1':[],
+                      'v_bal_acc':[],'v_acc':[], 'v_auc':[], 'v_tp':[], 'v_tn':[], 'v_fp':[], 'v_fn':[],'v_sens':[], 'v_spec':[], 'v_ppv':[], 'v_npv':[], 'v_f1': []}
             # Run experiment multiple times (ex. 100)
             for r in range(self.runs):
 
@@ -174,18 +207,30 @@ class experiment_manager():
                 # avg_v_bal_acc, avg_v_auc, avg_v_sens, avg_v_spec, avg_v_prec, avg_v_npv (6-11)
                 
                 runs_dict['t_bal_acc'].append(run_results[0])
-                runs_dict['t_auc'].append(run_results[1])
-                runs_dict['t_sens'].append(run_results[2])
-                runs_dict['t_spec'].append(run_results[3])
-                runs_dict['t_ppv'].append(run_results[4])
-                runs_dict['t_npv'].append(run_results[5])
+                runs_dict['t_acc'].append(run_results[1])
+                runs_dict['t_auc'].append(run_results[2])
+                runs_dict['t_tp'].append(run_results[3])
+                runs_dict['t_tn'].append(run_results[4])
+                runs_dict['t_fp'].append(run_results[5])
+                runs_dict['t_fn'].append(run_results[6])
+                runs_dict['t_sens'].append(run_results[7])
+                runs_dict['t_spec'].append(run_results[8])
+                runs_dict['t_ppv'].append(run_results[9])
+                runs_dict['t_npv'].append(run_results[10])
+                runs_dict['t_f1'].append(run_results[11])
 
-                runs_dict['v_bal_acc'].append(run_results[6])
-                runs_dict['v_auc'].append(run_results[7])
-                runs_dict['v_sens'].append(run_results[8])
-                runs_dict['v_spec'].append(run_results[9])
-                runs_dict['v_ppv'].append(run_results[10])
-                runs_dict['v_npv'].append(run_results[11])
+                runs_dict['v_bal_acc'].append(run_results[12])
+                runs_dict['v_acc'].append(run_results[13])
+                runs_dict['v_auc'].append(run_results[14])
+                runs_dict['v_tp'].append(run_results[15])
+                runs_dict['v_tn'].append(run_results[16])
+                runs_dict['v_fp'].append(run_results[17])
+                runs_dict['v_fn'].append(run_results[18])
+                runs_dict['v_sens'].append(run_results[19])
+                runs_dict['v_spec'].append(run_results[20])
+                runs_dict['v_ppv'].append(run_results[21])
+                runs_dict['v_npv'].append(run_results[22])
+                runs_dict['v_f1'].append(run_results[23])
 
                 run +=1
 
@@ -194,33 +239,57 @@ class experiment_manager():
             # Calculate avg scores across all runs
             exp_results['model'].append(model_name)
             exp_results['avg_train_bal_acc'].append(runs_df['t_bal_acc'].mean())
+            exp_results['avg_train_acc'].append(runs_df['t_acc'].mean())
             exp_results['avg_train_auc'].append(runs_df['t_auc'].mean())
+            exp_results['avg_train_tp'].append(runs_df['t_tp'].mean())
+            exp_results['avg_train_tn'].append(runs_df['t_tn'].mean())
+            exp_results['avg_train_fp'].append(runs_df['t_fp'].mean())
+            exp_results['avg_train_fn'].append(runs_df['t_fn'].mean())
             exp_results['avg_train_sens'].append(runs_df['t_sens'].mean())
             exp_results['avg_train_spec'].append(runs_df['t_spec'].mean())
             exp_results['avg_train_ppv'].append(runs_df['t_ppv'].mean())
             exp_results['avg_train_npv'].append(runs_df['t_npv'].mean())
+            exp_results['avg_train_f1'].append(runs_df['t_f1'].mean())
 
             exp_results['avg_valid_bal_acc'].append(runs_df['v_bal_acc'].mean())
+            exp_results['avg_valid_acc'].append(runs_df['v_acc'].mean())
             exp_results['avg_valid_auc'].append(runs_df['v_auc'].mean())
+            exp_results['avg_valid_tp'].append(runs_df['v_tp'].mean())
+            exp_results['avg_valid_tn'].append(runs_df['v_tn'].mean())
+            exp_results['avg_valid_fp'].append(runs_df['v_fp'].mean())
+            exp_results['avg_valid_fn'].append(runs_df['v_fn'].mean())           
             exp_results['avg_valid_sens'].append(runs_df['v_sens'].mean())
             exp_results['avg_valid_spec'].append(runs_df['v_spec'].mean())
             exp_results['avg_valid_ppv'].append(runs_df['v_ppv'].mean())
             exp_results['avg_valid_npv'].append(runs_df['v_npv'].mean())
+            exp_results['avg_valid_f1'].append(runs_df['v_f1'].mean())
 
             std_results['model'].append(model_name)
             std_results['std_train_bal_acc'].append(runs_df['t_bal_acc'].std())
+            std_results['std_train_acc'].append(runs_df['t_acc'].std())
             std_results['std_train_auc'].append(runs_df['t_auc'].std())
+            std_results['std_train_tp'].append(runs_df['t_tp'].std())
+            std_results['std_train_tn'].append(runs_df['t_tn'].std())
+            std_results['std_train_fp'].append(runs_df['t_fp'].std())
+            std_results['std_train_fn'].append(runs_df['t_fn'].std())
             std_results['std_train_sens'].append(runs_df['t_sens'].std())
             std_results['std_train_spec'].append(runs_df['t_spec'].std())
             std_results['std_train_ppv'].append(runs_df['t_ppv'].std())
             std_results['std_train_npv'].append(runs_df['t_npv'].std())
+            std_results['std_train_f1'].append(runs_df['t_f1'].std())
 
             std_results['std_valid_bal_acc'].append(runs_df['v_bal_acc'].std())
+            std_results['std_valid_acc'].append(runs_df['v_acc'].std())
             std_results['std_valid_auc'].append(runs_df['v_auc'].std())
+            std_results['std_valid_tp'].append(runs_df['v_tp'].std())
+            std_results['std_valid_tn'].append(runs_df['v_tn'].std())
+            std_results['std_valid_fp'].append(runs_df['v_fp'].std())
+            std_results['std_valid_fn'].append(runs_df['v_fn'].std())
             std_results['std_valid_sens'].append(runs_df['v_sens'].std())
             std_results['std_valid_spec'].append(runs_df['v_spec'].std())
             std_results['std_valid_ppv'].append(runs_df['v_ppv'].std())
             std_results['std_valid_npv'].append(runs_df['v_npv'].std())
+            std_results['std_valid_f1'].append(runs_df['v_f1'].std())
 
         self.avg_results = pd.DataFrame(exp_results)
         self.std_results = pd.DataFrame(std_results)
