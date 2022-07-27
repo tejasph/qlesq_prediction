@@ -349,6 +349,11 @@ def main(eval_type : str, eval_name : str):
         X_test = X_test[X_test.index.isin(list(X_test.index.difference(y_test.index))) == False]
         y_test = y_test[y_test.index.isin(list(y_test.index.difference(X_test.index))) == False]
 
+        # For feature selection, adjust canbind dataset to have only selected columns
+        if X_train.shape[1] != X_test.shape[1]:
+            selected_cols = X_train.columns
+            X_test = X_test[selected_cols]
+
         y_train = y_train[['qlesq_QoL_threshold']]
         y_test = y_test[['qlesq_QoL_threshold']]
 
