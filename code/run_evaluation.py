@@ -321,8 +321,8 @@ def main(eval_type : str, eval_name : str):
         y_test_data = "y_test_77"
 
         models = overlapping_feat_models
-    
-    elif eval_type == "canbind":
+     
+    elif eval_type == "canbind": # Need to pull in selected cols for enet version of assessment
         x_train_data = "X_77_qlesq_sr__final_extval"
         y_train_data = "y_qlesq_77__final__targets"
 
