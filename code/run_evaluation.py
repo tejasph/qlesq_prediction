@@ -49,7 +49,7 @@ class evaluation_manager():
         self.X_test_type = x_test_data
         self.y_test_type = y_test_data
         self.models = dict()
-        self.runs = 10
+        self.runs = 100
         self.results_path = EVALUATION_RESULTS
         self.eval_name = eval_name
 
@@ -211,8 +211,7 @@ class evaluation_manager():
             raw_scores_dict[model_name + "_bal_acc"] = runs_df['test_bal_acc']
             raw_scores_dict[model_name + "_auc"] = runs_df['test_auc']
 
-            
-            
+
 
             # Calculate avg scores across all runs
             exp_results['model'].append(model_name)
