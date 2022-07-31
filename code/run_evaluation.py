@@ -146,7 +146,9 @@ class evaluation_manager():
         std_results = {'model':[], 
        'std_train_bal_acc':[],'std_train_acc':[], 'std_train_auc':[],'std_train_tp':[], 'std_train_tn':[], 'std_train_fp':[], 'std_train_fn':[], 'std_train_sens':[], 'std_train_spec':[], 'std_train_ppv':[], 'std_train_npv':[], 'std_train_f1':[],
       'std_test_bal_acc':[], 'std_test_acc':[], 'std_test_auc':[], 'std_test_tp':[], 'std_test_tn':[], 'std_test_fp':[], 'std_test_fn':[], 'std_test_sens':[], 'std_test_spec':[], 'std_test_ppv':[], 'std_test_npv':[], 'std_test_f1':[]}
-        
+
+        raw_scores_dict = dict()
+
         for model_name, model in self.models.items():
             #print(f"Running {model_name}")
             run = 1
@@ -204,6 +206,13 @@ class evaluation_manager():
                 run +=1
 
             runs_df = pd.DataFrame(runs_dict)
+
+            # Store raw bacc and auc scores for t-test comparison
+            raw_scores_dict[model_name + "_bal_acc"] = runs_df['test_bal_acc']
+            raw_scores_dict[model_name + "_auc"] = runs_df['test_auc']
+
+            
+            
 
             # Calculate avg scores across all runs
             exp_results['model'].append(model_name)
@@ -263,6 +272,7 @@ class evaluation_manager():
 
             self.process_feature_importances(feat_importances, model_name)
 
+        pd.DataFrame(raw_scores_dict).to_csv(self.out_path + "/" + self.eval_name + "_raw_scores.csv" , index = False)
         self.avg_results = pd.DataFrame(exp_results)
         self.std_results = pd.DataFrame(std_results)
         
