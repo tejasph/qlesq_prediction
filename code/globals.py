@@ -17,34 +17,34 @@ EVALUATION_RESULTS = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\r
 # Excellent article on class imbalance management in GBDT (https://towardsdatascience.com/practical-tips-for-class-imbalance-in-binary-classification-6ee29bcdb8a7)
 
 
-### New model parameters (July 26 2022)
+### New model parameters (Aug 2022)
 
 # Full
 full_feat_models = {'Dummy_Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
-      'Random_Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', criterion = 'gini', max_depth = 2, max_features = 'sqrt', n_estimators = 500)),
-      'Logistic_Regression': ('lr', LogisticRegression(solver = 'liblinear', class_weight = 'balanced', penalty = 'l2',  C = 0.09, tol = 0.01)),
+      'Random_Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', criterion = 'entropy', max_depth = 2, max_features = 'sqrt', n_estimators = 500)),
+      'Logistic_Regression': ('lr', LogisticRegression(solver = 'liblinear', class_weight = 'balanced', penalty = 'l2',  C = 0.01, tol = 0.01)),
       'KNearest_Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 17, p = 1, weights = 'uniform')),
       'Support_Vector_Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'auto', probability = True)),
       'Gradient Boosting Classifier': ('gbdt', GradientBoostingClassifier(learning_rate = 0.1, max_depth = 3, max_features = 'sqrt', n_estimators = 500, subsample = 0.9))}
 
 full_enet_feat_models = {'Dummy_Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
-      'Random_Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', criterion = 'entropy', max_depth = 2, max_features = 0.1, n_estimators = 500)),
-      'Logistic_Regression': ('lr', LogisticRegression(solver = 'liblinear', class_weight = 'balanced', penalty = 'l2',  C = 0.119, tol = 0.001)),
+      'Random_Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', criterion = 'entropy', max_depth = 4, max_features = 'log2', n_estimators = 500)),
+      'Logistic_Regression': ('lr', LogisticRegression(solver = 'liblinear', class_weight = 'balanced', penalty = 'l2',  C = 100, tol = 0.1)),
       'KNearest_Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 3, p = 1, weights = 'uniform')),
       'Support_Vector_Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'scale', probability = True)),
       'Gradient Boosting Classifier': ('gbdt', GradientBoostingClassifier(learning_rate = 1, max_depth = 2,max_features = "sqrt", n_estimators = 500, subsample = 0.9 ))}
 
 # Overlapping
 overlapping_feat_models = {'Dummy_Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
-      'Random_Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', criterion = 'entropy', max_depth = 2, max_features = 'sqrt', n_estimators = 500)),
-      'Logistic_Regression': ('lr', LogisticRegression(solver = 'liblinear', class_weight = 'balanced', penalty = 'l2',  C = 0.097, tol = 0.1)),
+      'Random_Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', criterion = 'gini', max_depth = 3, max_features = 0.1, n_estimators = 500)),
+      'Logistic_Regression': ('lr', LogisticRegression(solver = 'liblinear', class_weight = 'balanced', penalty = 'l2',  C = 0.1, tol = 0.1)),
       'KNearest_Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 1, p = 1, weights = 'uniform')),
       'Support_Vector_Machine':('svc', SVC(class_weight = 'balanced', C = 10, gamma = 'auto', probability = True)),
       'Gradient Boosting Classifier': ('gbdt', GradientBoostingClassifier(learning_rate = 0.1, max_depth = 2, max_features = 0.1, n_estimators = 500, subsample = 1.0 ))}
 
 overlapping_enet_feat_models = {'Dummy_Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
-      'Random_Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', criterion = 'entropy', max_depth = 2, max_features = 0.1, n_estimators = 500)),
-      'Logistic_Regression': ('lr', LogisticRegression(solver = 'liblinear', class_weight = 'balanced', penalty = 'l2',  C = 0.117, tol = 0.01)),
+      'Random_Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', criterion = 'gini', max_depth = 4, max_features = 'log2', n_estimators = 500)),
+      'Logistic_Regression': ('lr', LogisticRegression(solver = 'liblinear', class_weight = 'balanced', penalty = 'l2',  C = 0.1, tol = 0.1)),
       'KNearest_Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 7, p = 1, weights = 'distance')),
       'Support_Vector_Machine':('svc', SVC(class_weight = 'balanced', C = 10, gamma = 'auto', probability = True)),
       'Gradient Boosting Classifier': ('gbdt', GradientBoostingClassifier(learning_rate = 1, max_depth = 2, max_features = 0.2, n_estimators = 500, subsample = 1.0 ))}
