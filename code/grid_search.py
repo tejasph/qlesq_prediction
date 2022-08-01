@@ -61,13 +61,13 @@ def main(model_type: str, feat_type: str):
     if model_type == "rf":
         model = ('rf', RandomForestClassifier(n_estimators = 500, class_weight = 'balanced')) 
         model_params = {'rf__max_features': ['sqrt', 'log2', 0.33, 0.2, 0.1],
-            'rf__max_depth': [int(x) for x in np.linspace(2, 100, num = 10)],
+            'rf__max_depth': [int(x) for x in range(2, 30, 1)],
             'rf__criterion':['gini', 'entropy']}
 
     elif model_type == 'lr':
         model = ('lr', LogisticRegression(penalty = 'l2', class_weight = 'balanced', solver = 'liblinear'))
         model_params = {'lr__tol' : [0.1, 0.01, 0.001],
-                    'lr__C': [p/1000 for p in range(90, 120, 1)]}
+                    'lr__C': [0.001, 0.01, 0.1, 1, 10, 100, 1000]} #[p/1000 for p in range(90, 120, 1)]
 
     elif model_type == "svc":
         model = ('svc', SVC(class_weight = 'balanced'))
