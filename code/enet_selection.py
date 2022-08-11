@@ -22,7 +22,7 @@ def main(eval_type : str):
         y_test_data = "y_test_77"
 
 
-    elif eval_type == "over": # might need to also add canbind data as well
+    elif eval_type == "over": 
         x_train_data = "X_train_77_over"
         y_train_data = "y_train_77"
         x_test_data = "X_test_77_over"

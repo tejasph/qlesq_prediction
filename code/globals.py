@@ -49,6 +49,14 @@ overlapping_enet_feat_models = {'Dummy_Classification': ('dummy', DummyClassifie
       'Support_Vector_Machine':('svc', SVC(class_weight = 'balanced', C = 10, gamma = 'auto', probability = True)),
       'Gradient Boosting Classifier': ('gbdt', GradientBoostingClassifier(learning_rate = 1, max_depth = 2, max_features = 0.2, n_estimators = 500, subsample = 1.0 ))}
 
+
+# QLESQ vs QIDS vs both vs none
+
+qlesq_models = {}
+qids_models = {}
+qlesq_qids_models = {}
+no_qlesq_qids_models = {}
+
 ###Old Variables
 # Full  Variables
 # full_feat_models = {'Dummy_Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 

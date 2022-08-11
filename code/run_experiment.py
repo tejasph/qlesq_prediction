@@ -9,7 +9,7 @@ import os
 
 # Import paths
 from globals import DATA_MODELLING_FOLDER, EXPERIMENT_RESULTS
-from globals import full_feat_models, full_enet_feat_models
+from globals import full_feat_models, full_enet_feat_models, overlapping_feat_models, overlapping_enet_feat_models
 
 # Import sklearn processing/pipeline
 from sklearn.pipeline import Pipeline
