@@ -10,6 +10,8 @@ import os
 
 # Import paths
 from globals import DATA_MODELLING_FOLDER, EVALUATION_RESULTS, full_feat_models, overlapping_feat_models, full_enet_feat_models, overlapping_enet_feat_models
+from globals import qids_models, qlesq_models, qidsqlesq_models, noqidsqlesq_models
+from globals import over_qids_models, over_qlesq_models, over_qidsqlesq_models, over_noqidsqlesq_models
 
 # Import sklearn processing/pipeline
 from sklearn.pipeline import Pipeline
@@ -297,7 +299,7 @@ def main(eval_type : str, eval_name : str):
 
     startTime = datetime.datetime.now()
 
-    assert eval_type in ['full', 'full_enet',  'over', 'over_enet', 'canbind', 'canbind_enet'], "eval_type (1st argument) was not valid. The only 3 options are 'full', 'over', and 'canbind'."
+    assert eval_type in ['full', 'full_enet',  'over', 'over_enet', 'canbind', 'canbind_enet', 'full_qids', 'full_qlesq', 'full_qidsqlesq', 'full_noqidsqlesq'], "eval_type (1st argument) was not valid. The only 3 options are 'full', 'over', and 'canbind'."
 
     if eval_type == "full": 
         x_train_data = "X_train_77"
@@ -314,6 +316,39 @@ def main(eval_type : str, eval_name : str):
         y_test_data = "y_test_77"
 
         models = full_enet_feat_models
+
+    elif eval_type == "full_qids":
+        x_train_data = "X_train_77_qids"
+        y_train_data = "y_train_77"
+        x_test_data = "X_test_77_qids"
+        y_test_data = "y_test_77"
+
+        models = qids_models
+
+    elif eval_type == "full_qlesq":
+        x_train_data = "X_train_77_qlesq"
+        y_train_data = "y_train_77"
+        x_test_data = "X_test_77_qlesq"
+        y_test_data = "y_test_77"
+
+        models = qlesq_models
+
+    elif eval_type == "full_qidsqlesq":
+        x_train_data = "X_train_77_qidsqlesq"
+        y_train_data = "y_train_77"
+        x_test_data = "X_test_77_qidsqlesq"
+        y_test_data = "y_test_77"
+
+        models = qidsqlesq_models
+
+    elif eval_type == "full_noqidsqlesq":
+        x_train_data = "X_train_77_noqidsqlesq"
+        y_train_data = "y_train_77"
+        x_test_data = "X_test_77_noqidsqlesq"
+        y_test_data = "y_test_77"
+
+        models = noqidsqlesq_models
+
 
     # elif eval_type == "full_rfe":
     #     x_train_data = "X_train_77_rfe"
@@ -338,6 +373,38 @@ def main(eval_type : str, eval_name : str):
         y_test_data = "y_test_77"
 
         models = overlapping_enet_feat_models
+
+    elif eval_type == "over_qids":
+        x_train_data = "X_train_77_over_qids"
+        y_train_data = "y_train_77"
+        x_test_data = "X_test_77_over_qids"
+        y_test_data = "y_test_77"
+
+        models = over_qids_models
+
+    elif eval_type == "over_qlesq":
+        x_train_data = "X_train_77_over_qlesq"
+        y_train_data = "y_train_77"
+        x_test_data = "X_test_77_over_qlesq"
+        y_test_data = "y_test_77"
+
+        models = over_qlesq_models
+
+    elif eval_type == "over_qidsqlesq":
+        x_train_data = "X_train_77_over_qidsqlesq"
+        y_train_data = "y_train_77"
+        x_test_data = "X_test_77_over_qidsqlesq"
+        y_test_data = "y_test_77"
+
+        models = over_qidsqlesq_models
+
+    elif eval_type == "over_noqidsqlesq":
+        x_train_data = "X_train_77_over_noqidsqlesq"
+        y_train_data = "y_train_77"
+        x_test_data = "X_test_77_over_noqidsqlesq"
+        y_test_data = "y_test_77"
+
+        models = over_noqidsqlesq_models
      
     elif eval_type == "canbind": # Need to pull in selected cols for enet version of assessment
         x_train_data = "X_77_qlesq_sr__final_extval"

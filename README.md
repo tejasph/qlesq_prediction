@@ -45,6 +45,10 @@ Listed below is a step-by-step rundown the project pipeline. All python commands
 
     - `python code/train_test_split.py X_77_qlesq_sr__final.csv y_qlesq_77__final__targets.csv` 
 
+7) Create QIDS/QLESQ subsets
+
+    - `python code/qids_qlesq_subprep.py full`
+
 7) Optional: Running a GridSearch (before running, check parameter grids and adjust parameter space as needed)
 
 

@@ -13,7 +13,7 @@ def main(eval_type : str):
     startTime = datetime.datetime.now()
 
     # Assure the type of dataset is correctly established
-    assert eval_type in ['full', 'over'], "eval_type (1st argument) was not valid. The only 2 options are 'full', 'over'."
+    assert eval_type in ['full', 'over', 'full_noqidsqlesq'], "eval_type (1st argument) was not valid. The only 2 options are 'full', 'over'."
 
     if eval_type == "full": 
         x_train_data = "X_train_77"
@@ -28,6 +28,12 @@ def main(eval_type : str):
         x_test_data = "X_test_77_over"
         y_test_data = "y_test_77"
 
+    elif eval_type == "full_noqidsqlesq":
+        x_train_data = "X_train_77_noqidsqlesq"
+        y_train_data = "y_train_77"
+        x_test_data = "X_test_77_noqidsqlesq"
+        y_test_data = "y_test_77"
+
 
     # Create pathing
     x_train_path = os.path.join(DATA_MODELLING_FOLDER, x_train_data)
@@ -39,7 +45,7 @@ def main(eval_type : str):
     X_test = pd.read_csv(x_test_path + ".csv").set_index('subjectkey')
 
     enet_model = ElasticNetCV(l1_ratio=[.1, .5, .7, .9], eps=0.005, n_alphas=30, fit_intercept=True,
-                    normalize=True, precompute='auto', max_iter=1000, tol=0.0001, cv=5,
+                    normalize=True, precompute='auto', max_iter=5000, tol=0.0001, cv=5,
                     copy_X=True, n_jobs=-1)
 
     enet_model.fit(X_train, y_train.to_numpy().ravel())

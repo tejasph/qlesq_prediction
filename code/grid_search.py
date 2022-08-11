@@ -69,6 +69,13 @@ def main(model_type: str, feat_type: str):
         model_params = {'lr__tol' : [0.1, 0.01, 0.001],
                     'lr__C': [0.001, 0.01, 0.1, 1, 10, 100, 1000]} #[p/1000 for p in range(90, 120, 1)]
 
+    elif model_type == "lr_enet":
+        model = ('lr', LogisticRegression(penalty = 'elasticnet', class_weight = 'balanced', solver = 'saga', max_iter = 1000))
+        model_params = {'lr__tol' : [0.1, 0.01, 0.001, 0.0001],
+                'lr__C': [p/1000 for p in range(90, 120, 1)],
+                'lr__l1_ratio': [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
+
+
     elif model_type == "svc":
         model = ('svc', SVC(class_weight = 'balanced'))
         model_params = {'svc__gamma': ['scale', 'auto'],
@@ -101,7 +108,25 @@ def main(model_type: str, feat_type: str):
         x_data = "X_train_77_enet"
     elif feat_type == "over_enet":
         x_data = "X_train_77_over_enet"
-    else: raise Exception("feat_type doesn't match options for FI. Choose: full, over, or rfe")
+    elif feat_type == "full_qids":
+        x_data = "X_train_77_qids"
+    elif feat_type == "full_qlesq":
+        x_data = "X_train_77_qlesq"
+    elif feat_type == "full_qidsqlesq":
+        x_data = "X_train_77_qidsqlesq"
+    elif feat_type == "full_noqidsqlesq":
+        x_data = "X_train_77_noqidsqlesq"
+    elif feat_type == "full_noqidsqlesq_enet":
+        x_data = "X_train_77_noqidsqlesq_enet"
+    elif feat_type == "over_qids":
+        x_data = "X_train_77_over_qids"
+    elif feat_type == "over_qlesq":
+        x_data = "X_train_77_over_qlesq"
+    elif feat_type == "over_qidsqlesq":
+        x_data = "X_train_77_over_qidsqlesq"
+    elif feat_type == "over_noqidsqlesq":
+        x_data = "X_train_77_over_noqidsqlesq"
+    else: raise Exception("feat_type doesn't match options for FI. Choose: full, over, full_enet, over_enet, qids, qlesq, qidsqlesq, noqidsqlesq")
 
     y_data = "y_train_77"
 
@@ -166,7 +191,7 @@ def main(model_type: str, feat_type: str):
     # lr = ('lr', LogisticRegression(penalty = 'elasticnet', class_weight = 'balanced', solver = 'saga', max_iter = 1000))
     # lr_params = {'lr__tol' : [0.1, 0.01, 0.001, 0.0001],
     #             'lr__C': [p/1000 for p in range(90, 120, 1)],
-    #             'lr__l1_ratio': [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]}
+    #             'lr__l1_ratio': [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
 
     # lr_pipe = get_scaled_pipeline(lr)
 

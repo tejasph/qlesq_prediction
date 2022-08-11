@@ -13,13 +13,26 @@ def main(eval_type : str):
     startTime = datetime.datetime.now()
 
     # Assure the type of dataset is correctly established
-    assert eval_type in ['full'], "eval_type (1st argument) was not valid. The only 2 options are 'full'."
+    assert eval_type in ['full', 'over'], "eval_type (1st argument) was not valid. The only 2 options are 'full' or 'over'."
 
     if eval_type == "full": 
         x_train_data = "X_train_77"
         y_train_data = "y_train_77"
         x_test_data = "X_test_77"
         y_test_data = "y_test_77"
+
+        qids_term = "qids"
+        qlesq_term = "qlesq"
+
+    elif eval_type == "over":
+
+        x_train_data = "X_train_77_over"
+        y_train_data = "y_train_77"
+        x_test_data = "X_test_77_over"
+        y_test_data = "y_test_77"
+
+        qids_term = "QIDS"
+        qlesq_term = "qlesq"
 
 
     # Create pathing
@@ -33,8 +46,8 @@ def main(eval_type : str):
 
 
     # Grab Qlesq and QIDS columns
-    qids_cols = list(X_train.loc[:, X_train.columns.str.contains("qids")].columns)
-    qlesq_cols = list(X_train.loc[:, X_train.columns.str.contains("qlesq")].columns)
+    qids_cols = list(X_train.loc[:, X_train.columns.str.contains(qids_term)].columns)
+    qlesq_cols = list(X_train.loc[:, X_train.columns.str.contains(qlesq_term)].columns)
 
     # Creat qlesq/qids sub dataframes
     X_train_qids = X_train[qids_cols]
