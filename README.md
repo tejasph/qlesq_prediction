@@ -31,7 +31,7 @@ Listed below is a step-by-step rundown the project pipeline. All python commands
 
     - `python code/create_targets.py data/STARD_raw/processed_data/final_xy_data_matrices/y_qlesq_77__final`
 
-    - `python code/create_targets.py data/STARD_raw/processed_data/final_xy_data_matrices/y_qlesq_91__final`
+    - `python code/create_targets.py data/STARD_raw/processed_data/final_xy_data_matrices/y_qlesq_91__final` # redundant now
 
     - `python code/create_targets.py data/canbind_raw_data/q-les-q/canbind_qlesq_y`
 
@@ -48,6 +48,16 @@ Listed below is a step-by-step rundown the project pipeline. All python commands
 7) Create QIDS/QLESQ subsets
 
     - `python code/qids_qlesq_subprep.py full`
+
+8) Elastic Net Selection
+
+- `python code/enet_selection.py full`
+- `python code/enet_selection.py over`
+- `python code/enet_selection.py full_noqidsqlesq`
+
+2 options for eval_type: 
+- Run feat selection on full dataset  (eval_type = "full")
+- Run feat selectoin on overlapping dataset (eval_type = "over")
 
 7) Optional: Running a GridSearch (before running, check parameter grids and adjust parameter space as needed)
 

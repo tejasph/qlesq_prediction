@@ -70,9 +70,9 @@ def main(model_type: str, feat_type: str):
                     'lr__C': [0.001, 0.01, 0.1, 1, 10, 100, 1000]} #[p/1000 for p in range(90, 120, 1)]
 
     elif model_type == "lr_enet":
-        model = ('lr', LogisticRegression(penalty = 'elasticnet', class_weight = 'balanced', solver = 'saga', max_iter = 1000))
+        model = ('lr', LogisticRegression(penalty = 'elasticnet', class_weight = 'balanced', solver = 'saga', max_iter = 5000))
         model_params = {'lr__tol' : [0.1, 0.01, 0.001, 0.0001],
-                'lr__C': [p/1000 for p in range(90, 120, 1)],
+                'lr__C': [0.001, 0.01, 0.1, 1, 10, 100, 1000],
                 'lr__l1_ratio': [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
 
 
