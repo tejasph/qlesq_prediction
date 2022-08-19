@@ -94,6 +94,38 @@ noqidsqlesq_enet_models ={'Dummy_Classification': ('dummy', DummyClassifier(stra
       'Support_Vector_Machine':('svc', SVC(class_weight = 'balanced', C = 10, gamma = 'auto', probability = True)),
       'Gradient Boosting Classifier': ('gbdt', GradientBoostingClassifier(learning_rate = 0.1, max_depth = 2, max_features = "log2", n_estimators = 500, subsample = 1.0))}
 
+over_qids_models = {'Dummy_Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
+      'Random_Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', criterion = 'entropy', max_depth = 3, max_features = 'sqrt', n_estimators = 500)),
+      'Logistic_Regression': ('lr', LogisticRegression(solver = 'liblinear', class_weight = 'balanced', penalty = 'l2',  C = 1, tol = 0.1)),
+      'Elastic Net' : ('en', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', C = 1000, l1_ratio = 1.0,  tol = 0.1)),
+      'KNearest_Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 1, p = 2, weights = 'uniform')),
+      'Support_Vector_Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'auto', probability = True)),
+      'Gradient Boosting Classifier': ('gbdt', GradientBoostingClassifier(learning_rate = 1, max_depth = 3, max_features = 0.2, n_estimators = 500, subsample = 0.7))}
+
+over_qlesq_models = {'Dummy_Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
+      'Random_Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', criterion = 'gini', max_depth = 3, max_features = 0.2, n_estimators = 500)),
+      'Logistic_Regression': ('lr', LogisticRegression(solver = 'liblinear', class_weight = 'balanced', penalty = 'l2',  C = 0.1, tol = 0.1)),
+      'Elastic Net' : ('en', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', C = 0.1, l1_ratio = 0.1,  tol = 0.01)),
+      'KNearest_Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 1, p = 2, weights = 'uniform')),
+      'Support_Vector_Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'auto', probability = True)),
+      'Gradient Boosting Classifier': ('gbdt', GradientBoostingClassifier(learning_rate = 1, max_depth = 3, max_features = 'log2', n_estimators = 500, subsample = 1.0))}
+
+over_qidsqlesq_models = {'Dummy_Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
+      'Random_Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', criterion = 'gini', max_depth = 4, max_features = 0.33, n_estimators = 500)),
+      'Logistic_Regression': ('lr', LogisticRegression(solver = 'liblinear', class_weight = 'balanced', penalty = 'l2',  C = 0.1, tol = 0.1)),
+      'Elastic Net' : ('en', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', C = 0.1, l1_ratio = 0.5,  tol = 0.01)),
+      'KNearest_Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 1, p = 2, weights = 'uniform')),
+      'Support_Vector_Machine':('svc', SVC(class_weight = 'balanced', C = 1, gamma = 'auto', probability = True)),
+      'Gradient Boosting Classifier': ('gbdt', GradientBoostingClassifier(learning_rate = 0.1, max_depth = 2, max_features = 0.2, n_estimators = 500, subsample = 0.7))}
+
+over_noqidsqlesq_models = {'Dummy_Classification': ('dummy', DummyClassifier(strategy = 'stratified')), 
+      'Random_Forest' : ('rf', RandomForestClassifier(class_weight = 'balanced', criterion = 'entropy', max_depth = 2, max_features = 0.33, n_estimators = 500)),
+      'Logistic_Regression': ('lr', LogisticRegression(solver = 'liblinear', class_weight = 'balanced', penalty = 'l2',  C = 1, tol = 0.1)),
+      'Elastic Net' : ('en', LogisticRegression(solver = 'saga', class_weight = 'balanced', penalty = 'elasticnet', C = 0.1, l1_ratio = 0.7,  tol = 0.1)),
+      'KNearest_Neighbors': ('knn', KNeighborsClassifier(n_neighbors = 1, p = 1, weights = 'uniform')),
+      'Support_Vector_Machine':('svc', SVC(class_weight = 'balanced', C = 10, gamma = 'auto', probability = True)),
+      'Gradient Boosting Classifier': ('gbdt', GradientBoostingClassifier(learning_rate = 1, max_depth = 3, max_features = 'log2', n_estimators = 500, subsample = 0.9))}
+
 
 ###Old Variables
 # Full  Variables
