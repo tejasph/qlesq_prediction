@@ -13,7 +13,7 @@ def main(eval_type : str):
     startTime = datetime.datetime.now()
 
     # Assure the type of dataset is correctly established
-    assert eval_type in ['full', 'over', 'full_noqidsqlesq'], "eval_type (1st argument) was not valid. The only 2 options are 'full', 'over'."
+    assert eval_type in ['full', 'over', 'full_noqidsqlesq', 'over_noqidsqlesq'], "eval_type (1st argument) was not valid. The only 2 options are 'full', 'over'."
 
     if eval_type == "full": 
         x_train_data = "X_train_77"
@@ -32,6 +32,12 @@ def main(eval_type : str):
         x_train_data = "X_train_77_noqidsqlesq"
         y_train_data = "y_train_77"
         x_test_data = "X_test_77_noqidsqlesq"
+        y_test_data = "y_test_77"
+
+    elif eval_type == "over_noqidsqlesq":
+        x_train_data = "X_train_77_over_noqidsqlesq"
+        y_train_data = "y_train_77"
+        x_test_data = "X_test_77_over_noqidsqlesq"
         y_test_data = "y_test_77"
 
 

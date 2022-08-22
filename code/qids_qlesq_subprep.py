@@ -32,7 +32,7 @@ def main(eval_type : str):
         y_test_data = "y_test_77"
 
         qids_term = "QIDS"
-        qlesq_term = "qlesq"
+        qlesq_term = "QLESQ"
 
 
     # Create pathing

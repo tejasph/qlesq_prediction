@@ -126,6 +126,8 @@ def main(model_type: str, feat_type: str):
         x_data = "X_train_77_over_qidsqlesq"
     elif feat_type == "over_noqidsqlesq":
         x_data = "X_train_77_over_noqidsqlesq"
+    elif feat_type == "over_noqidsqlesq_enet":
+        x_data = "X_train_77_over_noqidsqlesq_enet"
     else: raise Exception("feat_type doesn't match options for FI. Choose: full, over, full_enet, over_enet, qids, qlesq, qidsqlesq, noqidsqlesq")
 
     y_data = "y_train_77"

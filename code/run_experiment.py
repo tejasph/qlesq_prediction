@@ -11,6 +11,7 @@ import os
 from globals import DATA_MODELLING_FOLDER, EXPERIMENT_RESULTS
 from globals import full_feat_models, full_enet_feat_models, overlapping_feat_models, overlapping_enet_feat_models
 from globals import qids_models, qlesq_models, qidsqlesq_models, noqidsqlesq_models, noqidsqlesq_enet_models
+from globals import over_qids_models, over_qlesq_models, over_qidsqlesq_models, over_noqidsqlesq_models
 # from globals import over_qids_models, over_qlesq_models, over_qidsqlesq_models, over_noqidsqlesq_models
 
 # Import sklearn processing/pipeline
@@ -323,7 +324,7 @@ def main(eval_type: str, eval_name: str):
 
     startTime = datetime.datetime.now()
   
-    assert eval_type in ['full', 'full_enet', 'over', 'over_enet', 'full_qids', 'full_qlesq', 'full_qidsqlesq', 'full_noqidsqlesq', 'full_noqidsqlesq_enet'], "eval_type (1st argument) was not valid. The only 3 options are 'full', 'over', and 'canbind'."
+    assert eval_type in ['full', 'full_enet', 'over', 'over_enet', 'full_qids', 'full_qlesq', 'full_qidsqlesq', 'full_noqidsqlesq', 'full_noqidsqlesq_enet', 'over_qids', 'over_qlesq', 'over_qidsqlesq', 'over_noqidsqlesq', 'over_noqidsqlesq_enet'], "eval_type (1st argument) was not valid. The only 3 options are 'full', 'over', and 'canbind'."
 
     if eval_type == "full": 
         x_data = "X_train_77"
@@ -378,6 +379,9 @@ def main(eval_type: str, eval_name: str):
     elif eval_type == "over_noqidsqlesq":
         x_data = "X_train_77_over_noqidsqlesq"
         models = over_noqidsqlesq_models
+
+    elif eval_type == "over_noqidsqlesq_enet":
+        x_data = "X_train_77_over_noqidsqlesq_enet"
 
     y_data = "y_train_77"
 

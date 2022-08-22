@@ -441,6 +441,54 @@ def main(eval_type : str, eval_name : str):
 
         models = overlapping_enet_feat_models
 
+    elif eval_type == "canbind_qids":
+        x_train_data = "X_77_qlesq_sr__final_extval"
+        y_train_data = "y_qlesq_77__final__targets"
+
+        x_test_data = "X_test_cb_extval"
+        y_test_data = "canbind_qlesq_y__targets"
+
+        qids_features = pd.read_csv( os.path.join(DATA_MODELLING_FOLDER, "X_train_77_over_qids") + ".csv").set_index('subjectkey').columns
+        print(len(qids_features))
+
+        models = over_qids_models
+
+    elif eval_type == "canbind_qlesq":
+        x_train_data = "X_77_qlesq_sr__final_extval"
+        y_train_data = "y_qlesq_77__final__targets"
+
+        x_test_data = "X_test_cb_extval"
+        y_test_data = "canbind_qlesq_y__targets"
+
+        qlesq_features = pd.read_csv( os.path.join(DATA_MODELLING_FOLDER, "X_train_77_over_qlesq") + ".csv").set_index('subjectkey').columns
+        print(len(qlesq_features))
+
+        models = over_qlesq_models
+
+    elif eval_type == "canbind_qidsqlesq":
+        x_train_data = "X_77_qlesq_sr__final_extval"
+        y_train_data = "y_qlesq_77__final__targets"
+
+        x_test_data = "X_test_cb_extval"
+        y_test_data = "canbind_qlesq_y__targets"
+
+        qidsqlesq_features = pd.read_csv( os.path.join(DATA_MODELLING_FOLDER, "X_train_77_over_qidsqlesq") + ".csv").set_index('subjectkey').columns
+        print(len(qidsqlesq_features))
+
+        models = over_qidsqlesq_models
+
+    elif eval_type == "canbind_noqidsqlesq":
+        x_train_data = "X_77_qlesq_sr__final_extval"
+        y_train_data = "y_qlesq_77__final__targets"
+
+        x_test_data = "X_test_cb_extval"
+        y_test_data = "canbind_qlesq_y__targets"
+
+        noqidsqlesq_features = pd.read_csv( os.path.join(DATA_MODELLING_FOLDER, "X_train_77_over_noqidsqlesq") + ".csv").set_index('subjectkey').columns
+        print(len(noqidsqlesq_features))
+
+        models = over_noqidsqlesq_models
+
 
     x_train_path = os.path.join(DATA_MODELLING_FOLDER, x_train_data)
     y_train_path = os.path.join(DATA_MODELLING_FOLDER, y_train_data)
@@ -454,7 +502,7 @@ def main(eval_type : str, eval_name : str):
     y_test = pd.read_csv(y_test_path + ".csv").set_index('subjectkey')
 
     # Some processing was left out until the end for the canbind dataset
-    if eval_type == "canbind" or eval_type == "canbind_enet":
+    if eval_type == "canbind" or eval_type == "canbind_enet" or eval_type == "canbind_qids" or eval_type == "canbind_qlesq" or eval_type == "canbind_qidsqlesq" or eval_type == "canbind_noqidsqlesq":
         
         # Drops 5 rows that weren't shared by both dfs. The discrepancy is due to selection criteria in canbind_ygen.py applied on the y df.
         X_test = X_test[X_test.index.isin(list(X_test.index.difference(y_test.index))) == False]
@@ -467,6 +515,30 @@ def main(eval_type : str, eval_name : str):
         if eval_type == "canbind_enet":
             X_train = X_train[enet_features]
             X_test = X_test[enet_features]
+            print(X_train.shape)
+            print(X_test.shape)
+
+        elif eval_type == "canbind_qids":
+            X_train = X_train[qids_features]
+            X_test = X_test[qids_features]
+            print(X_train.shape)
+            print(X_test.shape)
+        
+        elif eval_type == "canbind_qlesq":
+            X_train = X_train[qlesq_features]
+            X_test = X_test[qlesq_features]
+            print(X_train.shape)
+            print(X_test.shape)
+
+        elif eval_type == "canbind_qidsqlesq":
+            X_train = X_train[qidsqlesq_features]
+            X_test = X_test[qidsqlesq_features]
+            print(X_train.shape)
+            print(X_test.shape)
+
+        elif eval_type == "canbind_noqidsqlesq":
+            X_train = X_train[noqidsqlesq_features]
+            X_test = X_test[noqidsqlesq_features]
             print(X_train.shape)
             print(X_test.shape)
 
