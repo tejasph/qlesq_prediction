@@ -24,6 +24,9 @@ def main(eval_type : str):
         qids_term = "qids"
         qlesq_term = "qlesq"
 
+        qids_cols =  ['imput_idsc5w0','imput_idsc5w2', 'imput_idsc5pccg'] # few additional imputed columns that contain qids info
+        qlesq_cols = []
+
     elif eval_type == "over":
 
         x_train_data = "X_train_77_over"
@@ -33,6 +36,9 @@ def main(eval_type : str):
 
         qids_term = "QIDS"
         qlesq_term = "QLESQ"
+
+        qids_cols = []
+        qlesq_cols = []
 
 
     # Create pathing
@@ -46,8 +52,8 @@ def main(eval_type : str):
 
 
     # Grab Qlesq and QIDS columns
-    qids_cols = list(X_train.loc[:, X_train.columns.str.contains(qids_term)].columns)
-    qlesq_cols = list(X_train.loc[:, X_train.columns.str.contains(qlesq_term)].columns)
+    qids_cols = qids_cols + list(X_train.loc[:, X_train.columns.str.contains(qids_term)].columns)
+    qlesq_cols = qlesq_cols + list(X_train.loc[:, X_train.columns.str.contains(qlesq_term)].columns)
 
     # Creat qlesq/qids sub dataframes
     X_train_qids = X_train[qids_cols]
