@@ -12,6 +12,7 @@ DATA_MODELLING_FOLDER = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_predictio
 GRID_SEARCH_RESULTS = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\grid_search"
 EXPERIMENT_RESULTS = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\experiments"
 EVALUATION_RESULTS = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations"
+ENET_RESULTS = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\enet"
 
 
 # Excellent article on class imbalance management in GBDT (https://towardsdatascience.com/practical-tips-for-class-imbalance-in-binary-classification-6ee29bcdb8a7)

@@ -6,7 +6,7 @@ import typer
 import datetime
 import os
 
-from globals import DATA_MODELLING_FOLDER
+from globals import DATA_MODELLING_FOLDER, ENET_RESULTS
 
 def main(eval_type : str):
 
@@ -71,6 +71,19 @@ def main(eval_type : str):
 
     X_train_enet.to_csv(DATA_MODELLING_FOLDER + "/" + x_train_data + "_enet.csv", index = True)
     X_test_enet.to_csv(DATA_MODELLING_FOLDER + "/" + x_test_data + "_enet.csv", index = True)
+
+    # Output selected ENET parameters 
+    if os.path.exists(ENET_RESULTS) == False:
+        os.mkdir(ENET_RESULTS)
+
+    f = open(os.path.join(ENET_RESULTS, eval_type + '.txt'), 'w')
+    f.write(f"Elastic Net parameters for: {eval_type}\n\n")
+    f.write(f"Trained on  {x_train_data} and {y_train_data}\n\n")
+    f.write(f"Evaluated on  {x_test_data} and {y_test_data}\n\n")
+    f.write(f"Alpha: {enet_model.alpha_}\n")
+    f.write(f"l1_ratio: {enet_model.l1_ratio_}\n")
+    f.write(f"Number of nonzero features selected: {len(selected_cols)}")
+
 
     print(f"Completed in: {datetime.datetime.now() - startTime}")
 
