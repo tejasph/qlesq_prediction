@@ -13,7 +13,7 @@ def main():
     if os.path.exists(STAT_RESULTS) == False:
         os.mkdir(STAT_RESULTS)
 
-    output_path = STAT_RESULTS + '/t_test_grid.csv'
+    output_path = STAT_RESULTS + '/table_1_stat_grid.csv'
 
     # Table 1 
 
