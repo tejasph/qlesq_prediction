@@ -39,7 +39,8 @@ def main():
 
 
     f = open(output_path, 'w+')
-    f.write('T_test Grid\n Balanced Accuracy two-tailed two-sided t-tests\n,')
+    f.write('T_test Grid\n Balanced Accuracy two-tailed two-sided t-tests\n')
+    f.write("STARD EVAL (n = 480) Balanced Accuracy P-Values\n")
 
     ######################### Compare bal accs
     for col1 in bal_acc_1:
@@ -54,7 +55,7 @@ def main():
             f.write(f'{ttest_ind(stard_full[col1], stard_full[col2]).pvalue},')
     #########################
 
-    f.write("\n\n AUC \n\n")
+    f.write("\n\n STARD EVAL (n = 480) AUC P-Values \n\n")
     ######################### Compare AUCS
     for col1 in auc_1:
         f.write(col1 + ",")
@@ -68,14 +69,56 @@ def main():
             f.write(f'{ttest_ind(stard_full[col1], stard_full[col2]).pvalue},')
     #########################
 
-    f.write("\n\n Model vs Model Enet \n\n")
+    # Remove enet model for next comparisons
+    bal_acc_1.remove("Elastic_Net_bal_acc")
+    bal_acc_2.remove("Elastic_Net_bal_acc")
+    auc_1.remove("Elastic_Net_auc")
+    auc_2.remove("Elastic_Net_auc")
+
+    f.write("\n\nSTARD EVAL (n = 61) Balanced Accuracy P-Values\n\n")
+
+    ######################### Compare bal accs
+    for col1 in bal_acc_1:
+        f.write(col1 + ",")
+    
+    for col1 in bal_acc_1:
+        f.write("\n" + col1 + ",")
+        for col2 in bal_acc_2:
+            print(col1)
+            print(col2)
+            print(ttest_ind(stard_full_enet[col1], stard_full_enet[col2]).pvalue)
+            f.write(f'{ttest_ind(stard_full_enet[col1], stard_full_enet[col2]).pvalue},')
+    #########################
+
+    f.write("\n\n STARD EVAL (n = 61) AUC P-Values \n\n")
+
+    ######################### Compare AUCS
+    for col1 in auc_1:
+        f.write(col1 + ",")
+    
+    for col1 in auc_1:
+        f.write("\n" + col1 + ",")
+        for col2 in auc_2:
+            print(col1)
+            print(col2)
+            print(ttest_ind(stard_full_enet[col1], stard_full_enet[col2]).pvalue)
+            f.write(f'{ttest_ind(stard_full_enet[col1], stard_full_enet[col2]).pvalue},')
+    #########################
+
+    f.write("\n\n Model vs Model Enet  \n\n")
     bal_accs = ["Dummy_Classification_bal_acc", "Logistic_Regression_bal_acc", "Random_Forest_bal_acc",
     "KNearest_Neighbors_bal_acc", "Support_Vector_Machine_bal_acc", "Gradient Boosting Classifier_bal_acc"]
 
     ######################### Model vs Model w/ Enet
 
-    f.write("Metric , P-Val," )
-    for col in bal_accs:
+    f.write("Metric , Balanced Acc P-Value," )
+    for col in bal_acc_1:
+        f.write("\n")
+        f.write(f'{col},')
+        f.write(f'{ttest_ind(stard_full[col], stard_full_enet[col]).pvalue},')
+
+    f.write("\n\nMetric , AUC P-Value," )
+    for col in auc_1:
         f.write("\n")
         f.write(f'{col},')
         f.write(f'{ttest_ind(stard_full[col], stard_full_enet[col]).pvalue},')
