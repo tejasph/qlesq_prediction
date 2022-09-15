@@ -124,7 +124,7 @@ class evaluation_manager():
         print(pipe_model.steps[1][1])
         if model_name == 'Dummy_Classification' or model_name == "KNearest_Neighbors" or model_name == "Support_Vector_Machine":
             FI = np.zeros(len(self.X_train.columns))
-        elif model_name == 'Logistic_Regression' or model_name == "Elastic Net":
+        elif model_name == 'Logistic_Regression' or model_name == "Elastic_Net":
             FI = pipe_model.steps[1][1].coef_.flatten()
         elif model_name == 'Random_Forest' or model_name == 'Gradient Boosting Classifier':
             FI = pipe_model.steps[1][1].feature_importances_.flatten()
