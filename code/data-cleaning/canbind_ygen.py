@@ -290,7 +290,7 @@ def generate_col_names(root, i = 14):
           
 def qlesq_y_gen(root_dir):
 
-    can_qlesq = pd.read_csv(root_dir  + "CBN01_QLESQ_DATA_forREVEIW.csv")
+    can_qlesq = pd.read_csv(root_dir + "CBN01_QLESQ_DATA_forREVEIW.csv")
 
     # Keep useful columns
     cols_to_drop = ['SITESYMBOL', 'Cohort_ID', 'AGE', 'SEX','VISITDATE', 'Dosage_ID']

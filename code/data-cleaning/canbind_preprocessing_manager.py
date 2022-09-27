@@ -33,6 +33,8 @@ This will output CSV files containing the merged and clean data.
 The method expects CSV files to be contained within their own subdirectories from the root directory, as is organized
 in the ZIP provided.
 """
+
+
 def aggregate_and_clean(root_dir, verbose=False, extra=False):
     global UNIQ_COLUMNS
     global COL_NAMES_CATEGORICAL
@@ -200,6 +202,7 @@ def aggregate_and_clean(root_dir, verbose=False, extra=False):
         NUM_DATA_COLUMNS = num_data_columns
         print_info(merged_df, extra)
 
+
 def print_info(merged_df, extra):
     print("\n____Data cleaning summary_____________________________________\n")
     print("Final dimension of the merged table:", merged_df.shape)
@@ -236,6 +239,7 @@ def print_info(merged_df, extra):
         if extra:
             print("\t", col_name, COLLISION_MANAGER[col_name])
 
+
 if __name__ == "__main__":
     if len(sys.argv) == 2 and os.path.isdir(sys.argv[1]):
         pathData = sys.argv[1]
@@ -257,10 +261,11 @@ if __name__ == "__main__":
     
     elif len(sys.argv) == 1:
         # pathData = r'C:\Users\jjnun\Documents\Sync\Research\1_CANBIND_Replication\teyden-git\data\canbind_data\\'
-        pathData = r'C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\data\canbind_raw_data'
+        # pathData = r'C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\data\canbind_raw_data'
+        pathData = r'C:\Users\jjnun\PycharmProjects\qlesq_prediction\data\canbind_data'
         aggregate_and_clean(pathData, verbose=False)
         ygen(pathData)
-        qlesq_y_gen("data/canbind_raw_data/q-les-q/")
+        qlesq_y_gen("data/canbind_data/q-les-q/")
         impute(pathData)
         convert_canbind_to_overlapping(pathData)
     else:

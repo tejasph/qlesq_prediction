@@ -38,6 +38,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import f1_score
 
+
 class experiment_manager():
     
     def __init__(self, X, y, x_data, y_data):
