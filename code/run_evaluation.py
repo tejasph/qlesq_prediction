@@ -6,6 +6,7 @@ import numpy as np
 import datetime
 import pickle
 import typer
+import shap
 import os
 
 # Import paths
@@ -126,8 +127,13 @@ class evaluation_manager():
             FI = np.zeros(len(self.X_train.columns))
         elif model_name == 'Logistic_Regression' or model_name == "Elastic_Net":
             FI = pipe_model.steps[1][1].coef_.flatten()
-        elif model_name == 'Random_Forest' or model_name == 'Gradient Boosting Classifier':
+        elif  model_name == 'Gradient Boosting Classifier':
             FI = pipe_model.steps[1][1].feature_importances_.flatten()
+        elif model_name == 'Random_Forest':
+            explainer = shap.TreeExplainer(pipe_model.steps[1][1])
+            shap_values = explainer.shap_values(pipe_model.steps[0][1].fit_transform(self.X_train))
+            shap_array = np.array(shap_values)
+            FI = np.abs(shap_array).mean(1).sum(0)
         else: raise Exception("model_name doesn't match options for FI")
 
         # Store model
