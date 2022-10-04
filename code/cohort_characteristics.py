@@ -12,6 +12,20 @@ def write_overlapping_characteristics(data_dir, results_dir):
     """ Writes characteristics of the overlapping datasets toa file, takes in directory of the X and y
     matrices, will place csv file output there too"""
 
+    def write_combo_characteristic(cols, description):
+        """
+        Inner function to write a characteristic based on multiple binary columns
+        :param cols:  columns to combine
+        :param description: definition to print to table
+        :return: calls write_characteristic_perc with needed info
+        """
+        combo_col_sd = X_sd_extval[cols].max(axis=1)
+        combo_col_cd = X_cb_extval[cols].max(axis=1)
+
+        sd_val = combo_col_sd.value_counts().to_dict()[1]
+        cb_val = combo_col_cd.value_counts().to_dict()[1]
+        write_characteristic_perc(description, sd_val, sd_n, cb_val, cb_n, f)
+
     # Read Matrices as pandas dataframes
     X_cb_extval = pd.read_csv(os.path.join(data_dir, "X_test_cb_extval.csv"))
     X_sd_extval = pd.read_csv(os.path.join(data_dir, "X_77_qlesq_sr__final_extval.csv"))
@@ -30,8 +44,6 @@ def write_overlapping_characteristics(data_dir, results_dir):
     X_cb_extval['Employed'] = cb_pre['EMPLOY_STATUS_1.0']
     X_sd_extval['Employed'] = sd_pre[['dm01_enroll__empl||3.0', 'dm01_enroll__empl||4.0']].max(axis=1)
 
-    ##print(X_sd_extval['Employed'].iloc[0:8])
-
     # Ensure number of subjects same between X and y matrices
     assert len(X_cb_extval) == len(y_cb_extval) and \
            len(X_sd_extval) == len(y_sd_extval) and \
@@ -42,7 +54,6 @@ def write_overlapping_characteristics(data_dir, results_dir):
     sd_n = len(X_sd_extval)
     cb_n = len(X_cb_extval)
 
-
     # Open file to write to. Write manually to allow strings
     f = open(results_dir + "/" + "paper_overlapping_characteristics.csv", "w")
     f.write("Characteristic, STAR*D,, CAN-BIND,\n")
@@ -51,7 +62,7 @@ def write_overlapping_characteristics(data_dir, results_dir):
     f.write(',n,%,n,%\n')
 
     # Female:Male. Write manually as aytypical
-    defin = "Female:Male (%)"
+    defin = "Female:Male"
 
     female_sd = X_sd_extval['SEX_female:::gender||F'].value_counts().to_dict()[1]
     male_sd = X_sd_extval['SEX_male:::gender||M'].value_counts().to_dict()[1]
@@ -66,74 +77,55 @@ def write_overlapping_characteristics(data_dir, results_dir):
     f.write(defin + "," + str(female_sd) + ":" + str(male_sd) + " ," + female_sd_perc + ":" + male_sd_perc + ",")
     f.write(str(female_cb) + ":" + str(male_cb) + " ," + female_cb_perc + ":" + male_cb_perc + "\n")
 
-    # Cannot do ethnicity, missing from STAR*D
+    # Married/Domestic Partnership
+    partnered_cols = ['MRTL_STATUS_Married:::dm01_enroll__marital||3.0',
+                      'MRTL_STATUS_Domestic Partnership:::dm01_enroll__marital||2.0']
 
-    # Marital status
-    married_sd = X_sd_extval['MRTL_STATUS_Married:::dm01_enroll__marital||3.0'].value_counts().to_dict()[1]
-    married_cb = X_cb_extval['MRTL_STATUS_Married:::dm01_enroll__marital||3.0'].value_counts().to_dict()[1]
-    write_characteristic_perc("Married (%)", married_sd, sd_n, married_cb, cb_n, f)
+    write_combo_characteristic(partnered_cols, "Married/Domestic Partnership")
 
-    dompart_sd = X_sd_extval['MRTL_STATUS_Domestic Partnership:::dm01_enroll__marital||2.0'].value_counts().to_dict()[1]
-    dompart_cb = X_cb_extval['MRTL_STATUS_Domestic Partnership:::dm01_enroll__marital||2.0'].value_counts().to_dict()[1]
-    write_characteristic_perc("Domestic Partnership (%)", dompart_sd, sd_n, dompart_cb, cb_n, f)
+    # Never Married/Divorced/Seperated/Widowed
+    single_cols = ['MRTL_STATUS_Widowed:::dm01_enroll__marital||6.0',
+                   'MRTL_STATUS_Divorced:::dm01_enroll__marital||5.0',
+                   'MRTL_STATUS_Separated:::dm01_enroll__marital||4.0',
+                   'MRTL_STATUS_Never Married:::dm01_enroll__marital||1.0']
 
-    widow_sd = X_sd_extval['MRTL_STATUS_Widowed:::dm01_enroll__marital||6.0'].value_counts().to_dict()[1]
-    widow_cb = X_cb_extval['MRTL_STATUS_Widowed:::dm01_enroll__marital||6.0'].value_counts().to_dict()[1]
-    write_characteristic_perc("Widowed (%)", widow_sd, sd_n, widow_cb, cb_n, f)
+    write_combo_characteristic(single_cols, "Never Married/Divorced/Seperated/Widowed")
 
-    divorc_sd = X_sd_extval['MRTL_STATUS_Divorced:::dm01_enroll__marital||5.0'].value_counts().to_dict()[1]
-    divorc_cb = X_cb_extval['MRTL_STATUS_Divorced:::dm01_enroll__marital||5.0'].value_counts().to_dict()[1]
-    write_characteristic_perc("Divorced (%)", divorc_sd, sd_n, divorc_cb, cb_n, f)
+    # Working/Student
+    sd = X_sd_extval['EMPLOY_STATUS_1.0:::dm01_enroll__empl||3.0'].value_counts().to_dict()[1]
+    cb = X_cb_extval['EMPLOY_STATUS_1.0:::dm01_enroll__empl||3.0'].value_counts().to_dict()[1]
+    write_characteristic_perc("Working/Student", sd, sd_n, cb, cb_n, f)
 
-    separ_sd = X_sd_extval['MRTL_STATUS_Separated:::dm01_enroll__marital||4.0'].value_counts().to_dict()[1]
-    separ_cb = X_cb_extval['MRTL_STATUS_Separated:::dm01_enroll__marital||4.0'].value_counts().to_dict()[1]
-    write_characteristic_perc("Separated (%)", separ_sd, sd_n, separ_cb, cb_n, f)
-
-    never_sd = X_sd_extval['MRTL_STATUS_Never Married:::dm01_enroll__marital||1.0'].value_counts().to_dict()[1]
-    never_cb = X_cb_extval['MRTL_STATUS_Never Married:::dm01_enroll__marital||1.0'].value_counts().to_dict()[1]
-    write_characteristic_perc("Never Married (%)", never_sd, sd_n, never_cb, cb_n, f)
+    # Unemployed/Disabled/Retired
+    not_work_cols = ['EMPLOY_STATUS_5.0:::dm01_enroll__empl||2.0',
+                     'EMPLOY_STATUS_2.0:::dm01_enroll__empl||1.0',
+                     'EMPLOY_STATUS_7.0:::dm01_enroll__empl||6.0']
+    write_combo_characteristic(single_cols, "Unemployed/Disabled/Retired")
 
     # Any substance-use
-    # First make two new columns for any substance use, by taking the max of the two substance columns (alch, non-alch)
-    X_cb_extval['substance'] = X_cb_extval[
-        ['MINI_ALCHL_ABUSE_TIME:::phx01__alcoh||1.0', 'MINI_SBSTNC_ABUSE_NONALCHL_TIME:::phx01__amphet||1.0']].max(
-        axis=1)
-    X_sd_extval['substance'] = X_sd_extval[
-        ['MINI_ALCHL_ABUSE_TIME:::phx01__alcoh||1.0', 'MINI_SBSTNC_ABUSE_NONALCHL_TIME:::phx01__amphet||1.0']].max(
-        axis=1)
+    substance_cols = ['MINI_ALCHL_ABUSE_TIME:::phx01__alcoh||1.0',
+                      'MINI_SBSTNC_ABUSE_NONALCHL_TIME:::phx01__amphet||1.0']
 
-    col = 'substance'
-    defin = "Substance use Disorder (%)"
-    sd = X_sd_extval[col].value_counts().to_dict()[1]
-    cb = X_cb_extval[col].value_counts().to_dict()[1]
-    write_characteristic_perc(defin, sd, sd_n, cb, cb_n, f)
+    write_combo_characteristic(substance_cols, "Any Substance Use Disorder")
 
     # Any anxiety disorder
     col = ':::imput_anyanxiety'
-    defin = "Any Anxiety Disorder (%)"
+    defin = "Any Anxiety Disorder"
     sd = X_sd_extval[col].value_counts().to_dict()[1]
     cb = X_cb_extval[col].value_counts().to_dict()[1]
     write_characteristic_perc(defin, sd, sd_n, cb, cb_n, f)
 
-    # Employment Status
-    sd = X_sd_extval['EMPLOY_STATUS_1.0:::dm01_enroll__empl||3.0'].value_counts().to_dict()[1]
-    cb = X_cb_extval['EMPLOY_STATUS_1.0:::dm01_enroll__empl||3.0'].value_counts().to_dict()[1]
-    write_characteristic_perc("Working/Student (%)", sd, sd_n, cb, cb_n, f)
-
-    sd = X_sd_extval['EMPLOY_STATUS_2.0:::dm01_enroll__empl||1.0'].value_counts().to_dict()[1]
-    cb = X_cb_extval['EMPLOY_STATUS_2.0:::dm01_enroll__empl||1.0'].value_counts().to_dict()[1]
-    write_characteristic_perc("Disabled(%)", sd, sd_n, cb, cb_n, f)
-
-    sd = X_sd_extval['EMPLOY_STATUS_5.0:::dm01_enroll__empl||2.0'].value_counts().to_dict()[1]
-    cb = X_cb_extval['EMPLOY_STATUS_5.0:::dm01_enroll__empl||2.0'].value_counts().to_dict()[1]
-    write_characteristic_perc("Unemployed (%)", sd, sd_n, cb, cb_n, f)
-
-    sd = X_sd_extval['EMPLOY_STATUS_7.0:::dm01_enroll__empl||6.0'].value_counts().to_dict()[1]
-    cb = X_cb_extval['EMPLOY_STATUS_7.0:::dm01_enroll__empl||6.0'].value_counts().to_dict()[1]
-    write_characteristic_perc("Retired (%)", sd, sd_n, cb, cb_n, f)
-
     # line for mean and %
     f.write(', Mean, SD, Mean, SD\n')
+
+    # Education
+    defin = "Years of education"
+    edu_years_mn_sd = X_sd_extval['EDUC:::dm01_enroll__educat'].mean()
+    edu_years_mn_cb = X_cb_extval['EDUC:::dm01_enroll__educat'].mean()
+
+    edu_years_std_sd = X_sd_extval['EDUC:::dm01_enroll__educat'].std()
+    edu_years_std_cb = X_cb_extval['EDUC:::dm01_enroll__educat'].std()
+    write_characteristic_cust(defin, edu_years_mn_sd, edu_years_std_sd, edu_years_mn_cb, edu_years_std_cb, f)
 
     # Employment Status: Hours worked if employed
     hrs_wrk_mn_sd = X_sd_extval[X_sd_extval['Employed'] > 0]['LAM_2_baseline:::wpai01__wpai_totalhrs'].mean()
@@ -141,7 +133,7 @@ def write_overlapping_characteristics(data_dir, results_dir):
 
     hrs_wrk_std_sd = X_sd_extval[X_sd_extval['Employed'] > 0]['LAM_2_baseline:::wpai01__wpai_totalhrs'].std()
     hrs_wrk_std_cb = X_cb_extval[X_cb_extval['Employed'] > 0]['LAM_2_baseline:::wpai01__wpai_totalhrs'].std()
-    defin = "Hours worked over last two weeks if employed (SD)"
+    defin = "Hours worked over last two weeks if employed"
     f.write(defin + "," + "{:.1f}".format(hrs_wrk_mn_sd) + " ," + "{:.1f}".format(hrs_wrk_std_sd) + ",")
     f.write("{:.1f}".format(hrs_wrk_mn_cb) + " ," + "{:.1f}".format(hrs_wrk_std_cb) + ",\n")
 
@@ -155,55 +147,49 @@ def write_overlapping_characteristics(data_dir, results_dir):
     f.write(defin + "," + "{:.1f}".format(hrs_msd_mn_sd) + "," + "{:.1f}".format(hrs_msd_std_sd) + ",")
     f.write("{:.1f}".format(hrs_msd_mn_cb) + " ," + "{:.1f}".format(hrs_msd_std_cb) + "\n")
 
-    # Education
-    defin = "Years of education (SD)"
-    edu_years_mn_sd = X_sd_extval['EDUC:::dm01_enroll__educat'].mean()
-    edu_years_mn_cb = X_cb_extval['EDUC:::dm01_enroll__educat'].mean()
+    # Have some extra depression characteristics used in last paper, will skip for now
+    include_depression_detailed = False
+    if include_depression_detailed:
+        # Age at onset of first depression PSYHIS_MDD_AGE:::phx01__dage
+        defin = "Age in years at onset of depression (SD)"
+        col = 'PSYHIS_MDD_AGE:::phx01__dage'
+        sd = X_sd_extval[col].mean()
+        cb = X_cb_extval[col].mean()
 
-    edu_years_std_sd = X_sd_extval['EDUC:::dm01_enroll__educat'].std()
-    edu_years_std_cb = X_cb_extval['EDUC:::dm01_enroll__educat'].std()
-    write_characteristic_cust(defin, edu_years_mn_sd, edu_years_std_sd, edu_years_mn_cb, edu_years_std_cb, f)
+        sd_br = X_sd_extval[col].std()
+        cb_br = X_cb_extval[col].std()
+        write_characteristic_cust(defin, sd, sd_br, cb, cb_br, f)
 
-    # Age at onset of first depression PSYHIS_MDD_AGE:::phx01__dage
-    defin = "Age in years at onset of depression (SD)"
-    col = 'PSYHIS_MDD_AGE:::phx01__dage'
-    sd = X_sd_extval[col].mean()
-    cb = X_cb_extval[col].mean()
+        # Prior depressive episode
+        col = 'PSYHIS_MDD_PREV:::'
+        defin = "Prior depressive episode (%)"
+        sd = X_sd_extval[col].value_counts().to_dict()[1]
+        cb = X_cb_extval[col].value_counts().to_dict()[1]
+        write_characteristic_perc(defin, sd, sd_n, cb, cb_n, f)
 
-    sd_br = X_sd_extval[col].std()
-    cb_br = X_cb_extval[col].std()
-    write_characteristic_cust(defin, sd, sd_br, cb, cb_br, f)
+        # No. prior episodes. Subtract 1 as the col counts current episode
+        defin = "No. of prior depressive episodes (SD)"
+        col = 'PSYHIS_MDE_NUM:::phx01__epino'
+        sd = X_sd_extval[col].sub(1).mean()
+        cb = X_cb_extval[col].sub(1).mean()
 
-    # Prior depressive episode
-    col = 'PSYHIS_MDD_PREV:::'
-    defin = "Prior depressive episode (%)"
-    sd = X_sd_extval[col].value_counts().to_dict()[1]
-    cb = X_cb_extval[col].value_counts().to_dict()[1]
-    write_characteristic_perc(defin, sd, sd_n, cb, cb_n, f)
+        sd_br = X_sd_extval[col].sub(1).std()
+        cb_br = X_cb_extval[col].sub(1).std()
+        write_characteristic_cust(defin, sd, sd_br, cb, cb_br, f)
 
-    # No. prior episodes. Subtract 1 as the col counts current episode
-    defin = "No. of prior depressive episodes (SD)"
-    col = 'PSYHIS_MDE_NUM:::phx01__epino'
-    sd = X_sd_extval[col].sub(1).mean()
-    cb = X_cb_extval[col].sub(1).mean()
+        # Current episode duration. Might want to cat this like in the paper
+        defin = "Current episode duration in months (SD)"
+        col = 'PSYHIS_MDE_EP_DUR_MO:::phx01__episode_date'
+        sd = X_sd_extval[col].mean()
+        cb = X_cb_extval[col].mean()
 
-    sd_br = X_sd_extval[col].sub(1).std()
-    cb_br = X_cb_extval[col].sub(1).std()
-    write_characteristic_cust(defin, sd, sd_br, cb, cb_br, f)
-
-    # Current episode duration. Might want to cat this like in the paper
-    defin = "Current episode duration in months (SD)"
-    col = 'PSYHIS_MDE_EP_DUR_MO:::phx01__episode_date'
-    sd = X_sd_extval[col].mean()
-    cb = X_cb_extval[col].mean()
-
-    sd_br = X_sd_extval[col].std()
-    cb_br = X_cb_extval[col].std()
-    write_characteristic_cust(defin, sd, sd_br, cb, cb_br, f)
+        sd_br = X_sd_extval[col].std()
+        cb_br = X_cb_extval[col].std()
+        write_characteristic_cust(defin, sd, sd_br, cb, cb_br, f)
 
     # QIDS-SR Total Baseline
     col = 'QIDS_OVERL_SEVTY_baseline:::qids01_w0sr__qstot'
-    defin = "Baseline QIDS-SR Total Score (SD)"
+    defin = "Baseline QIDS-SR Total Score"
     sd = X_sd_extval[col].mean()
     cb = X_cb_extval[col].mean()
 
@@ -213,7 +199,7 @@ def write_overlapping_characteristics(data_dir, results_dir):
 
     # QIDS-SR Total Week 2
     col = 'QIDS_OVERL_SEVTY_week2:::qids01_w2sr__qstot'
-    defin = "Week 2 QIDS-SR Total Score (SD)"
+    defin = "Week 2 QIDS-SR Total Score"
     sd = X_sd_extval[col].mean()
     cb = X_cb_extval[col].mean()
 
@@ -223,7 +209,7 @@ def write_overlapping_characteristics(data_dir, results_dir):
 
     # QLESQ-SF Total Baseline
     col = 'QLESQA_TOT_QLESQB_TOT_merged:::'
-    defin = "Baseline QLESQ-SF Total Score (SD)"
+    defin = "Baseline QLESQ-SF Total Score"
     sd = X_sd_extval[col].mean()
     cb = X_cb_extval[col].mean()
 
