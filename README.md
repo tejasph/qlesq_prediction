@@ -48,48 +48,47 @@ Listed below is a step-by-step rundown the project pipeline. All python commands
 7) Create QIDS/QLESQ subsets
 
     - `python code/qids_qlesq_subprep.py full`
+    - `python code/qids_qlesq_subprep.py over`
 
 8) Elastic Net Selection
 
-- `python code/enet_selection.py full`
-- `python code/enet_selection.py over`
-- `python code/enet_selection.py full_noqidsqlesq`
+- `python code/enet_selection.py [eval_type]`
 
-2 options for eval_type: 
+    4 options for eval_type: 
 - Run feat selection on full dataset  (eval_type = "full")
 - Run feat selectoin on overlapping dataset (eval_type = "over")
-
-7) Optional: Running a GridSearch (before running, check parameter grids and adjust parameter space as needed)
-
-
-    - `python code/grid_search.py [model_type] [data_type] `
-
-    model_type has several options:
-    - rf --> random forest
-    - lr --> logistic regression
-    - gbdt --> gradient boosting classifiers
-    - svc  --> support vector classifier
-    - knn --> k nearest neighbors
-
-    data_type has 3 options:
-    - full --> full feature set (480)
-    - over --> overlapping feature set (100)
-    - rfe --> recursive feature elimination set
-    - enet --> elastic net CV feature selection
+- Run feat selection on full dataset with no qidsqlesq feats (eval_type = "full_noqidsqlesq) [not used in paper]
+- Run feat selection on overlapping dataset with no qidsqlesq feats (eval_type = "over_noqidsqlesq) [not used in paper]
 
 
-8) Running an experiment: (can't remember if this is redundant or not...)
-
-Experiments are run via run_experiment.py. It utilizes classes so code in main() will need to be altered to contain models of your choice. The type of data is given as arguements to main().
 
 9) Run an Evaluation on STARD and CANBIND holdout sets:
 
-    There are three options:
+['full', 'full_enet',  'over', 'over_enet', 'canbind', 'canbind_enet', 'full_qids', 'full_qlesq', 'full_qidsqlesq', 'full_noqidsqlesq', 'full_noqidsqlesq_enet',
+                        'over_qids', 'over_qlesq', 'over_qidsqlesq', 'over_noqidsqlesq', 'canbind_qids', 'canbind_qlesq', 'canbind_qidsqlesq', 'canbind_noqidsqlesq'], "eval_type (1st argument) was not valid. The only 3 options are 'full', 'over', and 'canbind'."
+
+
+    There are several options:
     - Full feature evalution on STARD holdout   (eval_type ="full")
     - Full fetaures w/ enet selection (eval_type = "full_enet")
-    - Full features w/ recursive elimination selection (eval_type = "full_rfe")
+    - Full dataset with only QIDS features (eval_type = "full_qids")
+    - Full dataset with only QLESQ features (eval_type = "full_qlesq")
+    - Full dataset with only QIDSQLESQ features (eval_type = "full_qidsqlesq")
+    - Full dataset excluding QIDSQLESQ features (eval_type = "full_noqidsqlesq")
+    - Full dataset excluding QIDSQLESQ features w/ enet (eval_type = "full_noqidsqlesq_enet") [not used in paper]
+
     - Overlapping feature evaluation on STARD holdout (eval_type = "over")
+    - Overlapping dataset with only QIDS features (eval_type = "over_qids")
+    - Overlapping dataset with only QLESQ features (eval_type = "over_qlesq")
+    - Overlapping dataset with only QIDSQLESQ features (eval_type = "over_qidsqlesq")
+    - Overlapping dataset excluding QIDSQLESQ features (eval_type = "over_noqidsqlesq")
+
     - Overlapping feature evaluation on CANBIND holdout (eval_type = "canbind")
+    - Overlapping features w/ enet selection, evaluated on CANBIND dataset (eval_type = "canbind_enet")
+    - Overlapping features with only QIDS features, evaluated on CANBIND (eval_type = "canbind_qids)
+    - Overlapping features with only QLESQ features, evaluated on CANBIND (eval_type = "canbind_qlesq)
+    - Overlapping features with only QIDSQLESQ features, evaluated on CANBIND (eval_type = "canbind_qidsqlesq)
+    - Overlapping features excluding QIDSQLESQ features, evaluated on CANBIND (eval_type = "canbind_noqidsqlesq)
 
     `python code/run_evaluation.py [eval_type] [a name for the evaluation]`
 
@@ -116,4 +115,27 @@ b) Elastic Net Selection
 - Run feat selection on full dataset  (eval_type = "full")
 - Run feat selectoin on overlapping dataset (eval_type = "over")
 
+c)  Running a GridSearch (before running, check parameter grids and adjust parameter space as needed)
+
+optimized models are stored under `global.py`
+
+
+    - `python code/grid_search.py [model_type] [data_type] `
+
+    model_type has several options:
+    - rf --> random forest
+    - lr --> logistic regression
+    - gbdt --> gradient boosting classifiers
+    - svc  --> support vector classifier
+    - knn --> k nearest neighbors
+
+    data_type has 3 options:
+    - full --> full feature set (480)
+    - over --> overlapping feature set (100)
+    - rfe --> recursive feature elimination set
+    - enet --> elastic net CV feature selection
+
+d)8) Running an experiment: (can't remember if this is redundant or not...)
+
+Experiments are run via run_experiment.py. It utilizes classes so code in main() will need to be altered to contain models of your choice. The type of data is given as arguements to main().
 
