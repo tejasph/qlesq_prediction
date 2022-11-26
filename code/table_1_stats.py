@@ -18,11 +18,11 @@ def main():
     # Table 1 
 
     # Paths involved
-    STARD_FULL = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\STARD_FULL_EVAL"
-    STARD_FULL_ENET_EVAL = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\STARD_FULL_ENET_EVAL"
+    STARD_OVER_EVAL = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\STARD_OVER_EVAL"
+    CANBIND_EVAL = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\CANBIND_EVAL"
 
-    stard_full = pd.read_csv(os.path.join(STARD_FULL, "STARD_FULL_EVAL_raw_scores.csv"))
-    stard_full_enet = pd.read_csv(os.path.join(STARD_FULL_ENET_EVAL, "STARD_FULL_ENET_EVAL_raw_scores.csv"))
+    stard_full = pd.read_csv(os.path.join(STARD_OVER_EVAL, "STARD_OVER_EVAL_raw_scores.csv"))
+    stard_full_enet = pd.read_csv(os.path.join(CANBIND_EVAL, "STARD_CANBIND_EVAL_raw_scores.csv"))
 
     # cols that we want p-values for
     bal_acc_1 = ["Dummy_Classification_bal_acc", "Logistic_Regression_bal_acc", "Random_Forest_bal_acc",
@@ -40,9 +40,10 @@ def main():
 
     f = open(output_path, 'w+')
     f.write('T_test Grid\n Balanced Accuracy two-tailed two-sided t-tests\n')
-    f.write("STARD EVAL (n = 480) Balanced Accuracy P-Values\n")
+    f.write("STARD EVAL (k = 100) Balanced Accuracy P-Values\n")
 
     ######################### Compare bal accs
+    f.write(" ,")
     for col1 in bal_acc_1:
         f.write(col1 + ",")
     
@@ -55,8 +56,9 @@ def main():
             f.write(f'{ttest_ind(stard_full[col1], stard_full[col2]).pvalue},')
     #########################
 
-    f.write("\n\n STARD EVAL (n = 480) AUC P-Values \n\n")
+    f.write("\n\n STARD EVAL (k = 100) AUC P-Values \n\n")
     ######################### Compare AUCS
+    f.write(" ,")
     for col1 in auc_1:
         f.write(col1 + ",")
     
@@ -69,15 +71,11 @@ def main():
             f.write(f'{ttest_ind(stard_full[col1], stard_full[col2]).pvalue},')
     #########################
 
-    # Remove enet model for next comparisons
-    bal_acc_1.remove("Elastic_Net_bal_acc")
-    bal_acc_2.remove("Elastic_Net_bal_acc")
-    auc_1.remove("Elastic_Net_auc")
-    auc_2.remove("Elastic_Net_auc")
 
-    f.write("\n\nSTARD EVAL (n = 61) Balanced Accuracy P-Values\n\n")
+    f.write("\n\nCANBIND EVAL (k = 100) Balanced Accuracy P-Values\n\n")
 
     ######################### Compare bal accs
+    f.write(" ,")
     for col1 in bal_acc_1:
         f.write(col1 + ",")
     
@@ -90,9 +88,10 @@ def main():
             f.write(f'{ttest_ind(stard_full_enet[col1], stard_full_enet[col2]).pvalue},')
     #########################
 
-    f.write("\n\n STARD EVAL (n = 61) AUC P-Values \n\n")
+    f.write("\n\n CANBIND EVAL (k = 100) AUC P-Values \n\n")
 
     ######################### Compare AUCS
+    f.write(" ,")
     for col1 in auc_1:
         f.write(col1 + ",")
     
@@ -105,7 +104,7 @@ def main():
             f.write(f'{ttest_ind(stard_full_enet[col1], stard_full_enet[col2]).pvalue},')
     #########################
 
-    f.write("\n\n Model vs Model Enet  \n\n")
+    f.write("\n\n STAR*D holdout vs CAN-BIND-1 holdout  \n\n")
     bal_accs = ["Dummy_Classification_bal_acc", "Logistic_Regression_bal_acc", "Random_Forest_bal_acc",
     "KNearest_Neighbors_bal_acc", "Support_Vector_Machine_bal_acc", "Gradient Boosting Classifier_bal_acc"]
 

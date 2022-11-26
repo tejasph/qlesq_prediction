@@ -64,9 +64,6 @@ Listed below is a step-by-step rundown the project pipeline. All python commands
 
 9) Run an Evaluation on STARD and CANBIND holdout sets:
 
-['full', 'full_enet',  'over', 'over_enet', 'canbind', 'canbind_enet', 'full_qids', 'full_qlesq', 'full_qidsqlesq', 'full_noqidsqlesq', 'full_noqidsqlesq_enet',
-                        'over_qids', 'over_qlesq', 'over_qidsqlesq', 'over_noqidsqlesq', 'canbind_qids', 'canbind_qlesq', 'canbind_qidsqlesq', 'canbind_noqidsqlesq'], "eval_type (1st argument) was not valid. The only 3 options are 'full', 'over', and 'canbind'."
-
 
     There are several options:
     - Full feature evalution on STARD holdout   (eval_type ="full")
@@ -135,7 +132,7 @@ optimized models are stored under `global.py`
     - rfe --> recursive feature elimination set
     - enet --> elastic net CV feature selection
 
-d)8) Running an experiment: (can't remember if this is redundant or not...)
+d) Running an experiment: (can't remember if this is redundant or not...)
 
 Experiments are run via run_experiment.py. It utilizes classes so code in main() will need to be altered to contain models of your choice. The type of data is given as arguements to main().
 
