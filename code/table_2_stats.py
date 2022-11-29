@@ -18,73 +18,111 @@ def main():
     # Table 2
 
     # Paths involved
+    STARD_FULL_EVAL = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\STARD_FULL_EVAL"
+    STARD_NOQIDSQLESQ_FULL_EVAL =  r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\STARD_FULL_NOQIDSQLESQ_EVAL"
+
     STARD_OVER_EVAL = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\STARD_OVER_EVAL"
-    STARD_OVER_ENET_EVAL = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\STARD_OVER_ENET_EVAL"
+    STARD_QIDS_OVER_EVAL =  r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\STARD_over_qids_EVAL"
+    STARD_QLESQ_OVER_EVAL = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\STARD_over_qlesq_EVAL"
+    STARD_QIDSQLESQ_OVER_EVAL =  r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\STARD_over_qidsqlesq_EVAL"
+    STARD_NOQIDSQLESQ_OVER_EVAL =  r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\STARD_over_noqidsqlesq_EVAL"
+    
 
     CANBIND_EVAL = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\CANBIND_EVAL"
-    CANBIND_ENET_EVAL = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\CANBIND_ENET_EVAL"
+    CANBIND_QIDS_EVAL = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\CANBIND_qids_EVAL"
+    CANBIND_QLESQ_EVAL = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\CANBIND_qlesq_EVAL"
+    CANBIND_QIDSQLESQ_EVAL = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\CANBIND_qidsqlesq_EVAL"
+    CANBIND_NOQIDSQLESQ_EVAL = r"C:\Users\Tejas\Documents\qlesq_project\qlesq_prediction\results\evaluations\CANBIND_noqidsqlesq_EVAL"
 
-    stard_over = pd.read_csv(os.path.join(STARD_OVER_EVAL, "STARD_OVER_EVAL_raw_scores.csv"))
-    stard_over_enet = pd.read_csv(os.path.join(STARD_OVER_ENET_EVAL, "STARD_OVER_ENET_EVAL_raw_scores.csv"))
+    stard_full = pd.read_csv(os.path.join(STARD_FULL_EVAL, "STARD_FULL_EVAL_raw_scores.csv"))
+    stard_noqidsqlesq_full_eval = pd.read_csv(os.path.join(STARD_NOQIDSQLESQ_FULL_EVAL, "STARD_FULL_NOQIDSQLESQ_EVAL_raw_scores.csv"))
 
-    canbind = pd.read_csv(os.path.join(CANBIND_EVAL, "STARD_CANBIND_EVAL_raw_scores.csv"))
-    canbind_enet = pd.read_csv(os.path.join(CANBIND_ENET_EVAL, "STARD_CANBIND_ENET_EVAL_raw_scores.csv"))
+    #Note: naming conventions of the files depends on how user specified whilst running their evaluation scripts
+    stard_over_eval = pd.read_csv(os.path.join(STARD_OVER_EVAL, "STARD_OVER_EVAL_raw_scores.csv"))
+    stard_qids_over_eval = pd.read_csv(os.path.join(STARD_QIDS_OVER_EVAL, "STARD_qids_EVAL_raw_scores.csv"))
+    stard_qlesq_over_eval = pd.read_csv(os.path.join(STARD_QLESQ_OVER_EVAL, "STARD_qlesq_EVAL_raw_scores.csv"))
+    stard_qidsqlesq_over_eval = pd.read_csv(os.path.join(STARD_QIDSQLESQ_OVER_EVAL, "STARD_qidsqlesq_EVAL_raw_scores.csv"))
+    stard_noqidsqlesq_over_eval = pd.read_csv(os.path.join(STARD_NOQIDSQLESQ_OVER_EVAL, "STARD_over_noqidsqlesq_EVAL_raw_scores.csv"))
+
+    canbind_eval = pd.read_csv(os.path.join(CANBIND_EVAL, "STARD_CANBIND_EVAL_raw_scores.csv"))
+    canbind_qids_eval = pd.read_csv(os.path.join(CANBIND_QIDS_EVAL, "CANBIND_QIDS_EVAL_raw_scores.csv"))
+    canbind_qlesq_eval = pd.read_csv(os.path.join(CANBIND_QLESQ_EVAL, "CANBIND_QLESQ_EVAL_raw_scores.csv"))
+    canbind_qidsqlesq_eval = pd.read_csv(os.path.join(CANBIND_QIDSQLESQ_EVAL, "CANBIND_QIDSQLESQ_EVAL_raw_scores.csv"))
+    canbind_noqidsqlesq_eval = pd.read_csv(os.path.join(CANBIND_NOQIDSQLESQ_EVAL, "CANBIND_NOQIDSQLESQ_EVAL_raw_scores.csv"))
 
     # cols that we want p-values for
-    bal_acc_1 = ["Dummy_Classification_bal_acc", "Logistic_Regression_bal_acc", "Random_Forest_bal_acc",
-     "Elastic_Net_bal_acc", "KNearest_Neighbors_bal_acc", "Support_Vector_Machine_bal_acc", "Gradient Boosting Classifier_bal_acc"]
+    # bal_acc_1 = ["Dummy_Classification_bal_acc", "Logistic_Regression_bal_acc", "Random_Forest_bal_acc",
+    #  "Elastic_Net_bal_acc", "KNearest_Neighbors_bal_acc", "Support_Vector_Machine_bal_acc", "Gradient Boosting Classifier_bal_acc"]
 
-    bal_acc_2 = ["Dummy_Classification_bal_acc", "Logistic_Regression_bal_acc", "Random_Forest_bal_acc",
-     "Elastic_Net_bal_acc", "KNearest_Neighbors_bal_acc", "Support_Vector_Machine_bal_acc", "Gradient Boosting Classifier_bal_acc"]
+    # bal_acc_2 = ["Dummy_Classification_bal_acc", "Logistic_Regression_bal_acc", "Random_Forest_bal_acc",
+    #  "Elastic_Net_bal_acc", "KNearest_Neighbors_bal_acc", "Support_Vector_Machine_bal_acc", "Gradient Boosting Classifier_bal_acc"]
 
-    auc_1 = ["Dummy_Classification_auc", "Logistic_Regression_auc", "Random_Forest_auc",
-     "Elastic_Net_auc", "KNearest_Neighbors_auc", "Support_Vector_Machine_auc", "Gradient Boosting Classifier_auc"]
+    # auc_1 = ["Dummy_Classification_auc", "Logistic_Regression_auc", "Random_Forest_auc",
+    #  "Elastic_Net_auc", "KNearest_Neighbors_auc", "Support_Vector_Machine_auc", "Gradient Boosting Classifier_auc"]
 
-    auc_2 = ["Dummy_Classification_auc", "Logistic_Regression_auc", "Random_Forest_auc",
-     "Elastic_Net_auc", "KNearest_Neighbors_auc", "Support_Vector_Machine_auc", "Gradient Boosting Classifier_auc"]
+    # auc_2 = ["Dummy_Classification_auc", "Logistic_Regression_auc", "Random_Forest_auc",
+    #  "Elastic_Net_auc", "KNearest_Neighbors_auc", "Support_Vector_Machine_auc", "Gradient Boosting Classifier_auc"]
 
+    dfs_1 = [stard_full, stard_noqidsqlesq_full_eval, stard_over_eval, stard_qids_over_eval, stard_qlesq_over_eval, stard_qidsqlesq_over_eval, stard_noqidsqlesq_over_eval]
+    dfs_2 = [stard_full, stard_noqidsqlesq_full_eval, stard_over_eval, stard_qids_over_eval, stard_qlesq_over_eval, stard_qidsqlesq_over_eval, stard_noqidsqlesq_over_eval]
+    names = ['stard_full', 'stard_noqidsqlesq_full_eval', 'stard_over_eval', 'stard_qids_over_eval', 'stard_qlesq_over_eval', 'stard_qidsqlesq_over_eval', 'stard_noqidsqlesq_over_eval']
 
     f = open(output_path, 'w+')
     f.write('T_test Grid\n Balanced Accuracy two-tailed two-sided t-tests\n')
-    f.write("Overlapping STAR*D (n = 100) vs CANBIND: Balanced Accuracy and AUC P-Values\n")
+    f.write("Overlapping STAR*D (n = 100): Balanced Accuracy and AUC P-Values\n")
 
-    ######################### Overlapping STAR*D vs CANBIND
+    ######################### Overlapping STAR*D various feature sets
 
-    f.write("Metric , Balanced Acc P-Value," )
-    for col in bal_acc_1:
+    f.write("Metric , Balanced Acc P-Value,\n ," )
+    name_index = 0
+    for x in dfs_1:
+        f.write(names[name_index] + ",")
+        name_index += 1
+
+    name_index = 0 
+    for x in dfs_1:
         f.write("\n")
-        f.write(f'{col},')
-        f.write(f'{ttest_ind(stard_over[col], canbind[col]).pvalue},')
+        f.write(f'{names[name_index]},')
+        for y in dfs_2:
+            print(x['Random_Forest_bal_acc'])
+            print(y['Random_Forest_bal_acc'])
+            print(ttest_ind(x['Random_Forest_bal_acc'], y['Random_Forest_bal_acc']).pvalue)
+            p_val = ttest_ind(x['Random_Forest_bal_acc'], y['Random_Forest_bal_acc']).pvalue
+            f.write(str(p_val) + ",")
+        name_index += 1
 
     f.write("\n\nMetric , AUC P-Value," )
-    for col in auc_1:
+    for x in bal_acc_1:
         f.write("\n")
-        f.write(f'{col},')
-        f.write(f'{ttest_ind(stard_over[col], canbind[col]).pvalue},')
+        # f.write(f'{col},')
+        for y in bal_acc_2:
+            p_val = ttest_ind(x['Random_Forest_auc'], y['Random_Forest_auc']).pvalue
+            print(p_val)
+            f.write(str(p_val) + ",")
 
     ########################
 
     # Remove enet model for next comparisons
-    bal_acc_1.remove("Elastic_Net_bal_acc")
-    bal_acc_2.remove("Elastic_Net_bal_acc")
-    auc_1.remove("Elastic_Net_auc")
-    auc_2.remove("Elastic_Net_auc")
+    # bal_acc_1.remove("Elastic_Net_bal_acc")
+    # bal_acc_2.remove("Elastic_Net_bal_acc")
+    # auc_1.remove("Elastic_Net_auc")
+    # auc_2.remove("Elastic_Net_auc")
 
     f.write("\n\nOverlapping STARD ENet (n = 61) vs CANBIND  Balanced Accuracy and AUC P-Values\n\n")
 
     ######################### Overlapping STAR*D Enet vs CANBIND
 
-    f.write("Metric , Balanced Acc P-Value," )
-    for col in bal_acc_1:
-        f.write("\n")
-        f.write(f'{col},')
-        f.write(f'{ttest_ind(stard_over_enet[col], canbind_enet[col]).pvalue},')
+    # f.write("Metric , Balanced Acc P-Value," )
+    # for col in bal_acc_1:
+    #     f.write("\n")
+    #     f.write(f'{col},')
+    #     f.write(f'{ttest_ind(stard_over_enet[col], canbind_enet[col]).pvalue},')
 
-    f.write("\n\nMetric , AUC P-Value," )
-    for col in auc_1:
-        f.write("\n")
-        f.write(f'{col},')
-        f.write(f'{ttest_ind(stard_over_enet[col], canbind_enet[col]).pvalue},')
+    # f.write("\n\nMetric , AUC P-Value," )
+    # for col in auc_1:
+    #     f.write("\n")
+    #     f.write(f'{col},')
+    #     f.write(f'{ttest_ind(stard_over_enet[col], canbind_enet[col]).pvalue},')
 
     ########################
 
