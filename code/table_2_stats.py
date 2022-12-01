@@ -91,14 +91,24 @@ def main():
             f.write(str(p_val) + ",")
         name_index += 1
 
-    f.write("\n\nMetric , AUC P-Value," )
-    for x in bal_acc_1:
+    f.write("\n\nMetric , AUC P-Value, \n ," )
+
+    name_index = 0
+    for x in dfs_1:
+        f.write(names[name_index] + ",")
+        name_index += 1
+
+    name_index = 0 
+    for x in dfs_1:
         f.write("\n")
-        # f.write(f'{col},')
-        for y in bal_acc_2:
+        f.write(f'{names[name_index]},')
+        for y in dfs_2:
+            print(x['Random_Forest_auc'])
+            print(y['Random_Forest_auc'])
+            print(ttest_ind(x['Random_Forest_auc'], y['Random_Forest_auc']).pvalue)
             p_val = ttest_ind(x['Random_Forest_auc'], y['Random_Forest_auc']).pvalue
-            print(p_val)
             f.write(str(p_val) + ",")
+        name_index += 1
 
     ########################
 
@@ -108,11 +118,93 @@ def main():
     # auc_1.remove("Elastic_Net_auc")
     # auc_2.remove("Elastic_Net_auc")
 
-    f.write("\n\nOverlapping STARD ENet (n = 61) vs CANBIND  Balanced Accuracy and AUC P-Values\n\n")
+    canbind_1 = [canbind_eval, canbind_qids_eval, canbind_qlesq_eval, canbind_qidsqlesq_eval, canbind_noqidsqlesq_eval]
+    canbind_2 =  [canbind_eval, canbind_qids_eval, canbind_qlesq_eval, canbind_qidsqlesq_eval, canbind_noqidsqlesq_eval]
+    canbind_names = ['canbind_eval', 'canbind_qids_eval', 'canbind_qlesq_eval', 'canbind_qidsqlesq_eval', 'canbind_noqidsqlesq_eval']
 
-    ######################### Overlapping STAR*D Enet vs CANBIND
+    f.write("\n\n CANBIND  Balanced Accuracy and AUC P-Values\n\n")
 
-    # f.write("Metric , Balanced Acc P-Value," )
+    f.write("Metric , Balanced Acc P-Value,\n ," )
+    name_index = 0
+    for x in canbind_1:
+        f.write(canbind_names[name_index] + ",")
+        name_index += 1
+
+    name_index = 0 
+    for x in canbind_1:
+        f.write("\n")
+        f.write(f'{canbind_names[name_index]},')
+        for y in canbind_2:
+            print(x['Random_Forest_bal_acc'])
+            print(y['Random_Forest_bal_acc'])
+            print(ttest_ind(x['Random_Forest_bal_acc'], y['Random_Forest_bal_acc']).pvalue)
+            p_val = ttest_ind(x['Random_Forest_bal_acc'], y['Random_Forest_bal_acc']).pvalue
+            f.write(str(p_val) + ",")
+        name_index += 1
+
+    f.write("\n\nMetric , AUC P-Value, \n ," )
+
+    name_index = 0
+    for x in canbind_1:
+        f.write(canbind_names[name_index] + ",")
+        name_index += 1
+
+    name_index = 0 
+    for x in canbind_1:
+        f.write("\n")
+        f.write(f'{canbind_names[name_index]},')
+        for y in canbind_2:
+            print(x['Random_Forest_auc'])
+            print(y['Random_Forest_auc'])
+            print(ttest_ind(x['Random_Forest_auc'], y['Random_Forest_auc']).pvalue)
+            p_val = ttest_ind(x['Random_Forest_auc'], y['Random_Forest_auc']).pvalue
+            f.write(str(p_val) + ",")
+        name_index += 1
+
+    ######################### Overlapping STAR*D  vs CANBIND Balanced Accuracy
+
+    f.write("\n\n Feat Set , Balanced Acc P-Value, \n" )
+    f.write("Overlapping (k = 100) ,")
+    f.write(str(ttest_ind(stard_over_eval['Random_Forest_bal_acc'], canbind_eval['Random_Forest_bal_acc']).pvalue))
+    f.write("\n")
+
+    f.write("Qids (k = 47) ,")
+    f.write(str(ttest_ind(stard_qids_over_eval['Random_Forest_bal_acc'], canbind_qids_eval['Random_Forest_bal_acc']).pvalue))
+    f.write("\n")
+
+    f.write("Qlesq (k = 16) ,")
+    f.write(str(ttest_ind(stard_qlesq_over_eval['Random_Forest_bal_acc'], canbind_qlesq_eval['Random_Forest_bal_acc']).pvalue))
+    f.write("\n")
+
+    f.write("Qids + qlesq (k = 63) ,")
+    f.write(str(ttest_ind(stard_qidsqlesq_over_eval['Random_Forest_bal_acc'], canbind_qidsqlesq_eval['Random_Forest_bal_acc']).pvalue))
+    f.write("\n")
+
+    f.write("No Qids + qlesq (k = 37) ,")
+    f.write(str(ttest_ind(stard_noqidsqlesq_over_eval['Random_Forest_bal_acc'], canbind_noqidsqlesq_eval['Random_Forest_bal_acc']).pvalue))
+    f.write("\n\n")
+    ######################### Overlapping STAR*D  vs CANBIND AUC
+    f.write("\n Feat Set , AUC P-Value, \n" )
+    f.write("Overlapping (k = 100) ,")
+    f.write(str(ttest_ind(stard_over_eval['Random_Forest_auc'], canbind_eval['Random_Forest_auc']).pvalue))
+    f.write("\n")
+
+    f.write("Qids (k = 47) ,")
+    f.write(str(ttest_ind(stard_qids_over_eval['Random_Forest_auc'], canbind_qids_eval['Random_Forest_auc']).pvalue))
+    f.write("\n")
+
+    f.write("Qlesq (k = 16) ,")
+    f.write(str(ttest_ind(stard_qlesq_over_eval['Random_Forest_auc'], canbind_qlesq_eval['Random_Forest_auc']).pvalue))
+    f.write("\n")
+
+    f.write("Qids + qlesq (k = 63) ,")
+    f.write(str(ttest_ind(stard_qidsqlesq_over_eval['Random_Forest_auc'], canbind_qidsqlesq_eval['Random_Forest_auc']).pvalue))
+    f.write("\n")
+
+    f.write("No Qids + qlesq (k = 37) ,")
+    f.write(str(ttest_ind(stard_noqidsqlesq_over_eval['Random_Forest_auc'], canbind_noqidsqlesq_eval['Random_Forest_auc']).pvalue))
+    f.write("\n\n")
+
     # for col in bal_acc_1:
     #     f.write("\n")
     #     f.write(f'{col},')
