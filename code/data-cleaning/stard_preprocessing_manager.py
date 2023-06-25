@@ -1113,28 +1113,35 @@ def generate_qlesq_y(root_data_dir_path, output_name,  days_baseline_cutoff = 77
 
     # Subsetting to relevant columns
     qlesq = qlesq[['subjectkey', 'days_baseline', 'level', 'totqlesq', 'CallType']]
-
+    
     ########## General Cleaning
     print(f"Original shape: {qlesq.shape}")
     selector = subject_selector(qlesq)
+    print(len(selector.df.subjectkey.unique()))
 
     # Exclude people who switched to level 2 (most likely d/t to adverse effects)
     selector.filter_early_level_2_follow_up()
+    print(len(selector.df.subjectkey.unique()))
 
     # Only consider rows that fall below the days baseline cutoff (default is 8 weeks or 77 days)
     selector.filter_time_window(max_cutoff = days_baseline_cutoff)
+    print(len(selector.df.subjectkey.unique()))
 
     # Drop Na values for total qlesq
     selector.filter_NA()
+    print(len(selector.df.subjectkey.unique()))
 
     # Drop any duplicate rows
     selector.filter_duplicates()
+    print(len(selector.df.subjectkey.unique()))
 
     # Exclude Level 3
     selector.filter_lvl("Level 3")
+    print(len(selector.df.subjectkey.unique()))
 
     # Exclude level 4
     selector.filter_lvl("Level 4")
+    print(len(selector.df.subjectkey.unique()))
 
     # Drop any rows where level is = 2 but Calltype isn't Entry or Base
     # selector.filter_inappropriate_calltype("Level 2", ['Entry','Base'])
@@ -1154,6 +1161,7 @@ def generate_qlesq_y(root_data_dir_path, output_name,  days_baseline_cutoff = 77
     ##### Subject Selection
     qlesq_y = pd.DataFrame()
     group_qlesq = filtered_df.groupby('subjectkey')
+    counter = {'shape':0, 'start_day':0, 'end_day':0, 'baseline':0}
 
     # relevant_ids = []
     i = 0 
@@ -1175,6 +1183,7 @@ def generate_qlesq_y(root_data_dir_path, output_name,  days_baseline_cutoff = 77
 
         
         if data.shape[0] <= 1:
+            counter['shape'] +=1
             continue
         
         baseline = sorted_data.iloc[0]['totqlesq']
@@ -1185,13 +1194,16 @@ def generate_qlesq_y(root_data_dir_path, output_name,  days_baseline_cutoff = 77
         end_type = sorted_data.iloc[-1]['CallType']
         
         if start_day >= 21:  #8-21
+            counter['start_day'] +=1
             continue
         
         if end_day <= 21 or end_day >= days_baseline_cutoff:
+            counter['end_day'] +=1
             continue
 
         # Exclude patients who started with a Q-LES-Q baseline within community norm (ie. greater than 66)
         if baseline >= 67:
+            counter['baseline'] +=1
             continue
 
         assert sorted_data['totqlesq'].isna().sum() == 0, f"Total Qlesq has {sorted_data['totqlesq'].isna().sum()} NA values for {subject_id}"
@@ -1216,7 +1228,8 @@ def generate_qlesq_y(root_data_dir_path, output_name,  days_baseline_cutoff = 77
         qlesq_y.loc[i, 'end_qlesq'] = end_score
         qlesq_y.loc[i, 'end_lvl'] = end_lvl
         i += 1
-
+    print(len(qlesq_y.subjectkey.unique()))
+    print(counter)
     qlesq_y.to_csv(output_y_dir_path + output_name + CSV_SUFFIX, index=False)
 
     

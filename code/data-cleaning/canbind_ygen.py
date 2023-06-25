@@ -297,15 +297,19 @@ def qlesq_y_gen(root_dir):
     can_qlesq = can_qlesq.drop(columns = cols_to_drop)
 
     selector = qlesq_subject_selector(can_qlesq)
+    print(len(selector.df.SUBJLABEL.unique()))
 
     # Only keep treatment group
     selector.filter_treatment_group()
+    print(len(selector.df.SUBJLABEL.unique()))
 
     # Remove rows with NA for total QLESQ score (In Both A and B columns)
     selector.filter_NA()
+    print(len(selector.df.SUBJLABEL.unique()))
 
     # Only keep ids where a Baseline and a Week 8 score are present
     selector.filter_min_entries()
+    print(len(selector.df.SUBJLABEL.unique()))
 
     # We expect 176 valid entries for CanBind as per checks in Jupyter Lab
     
@@ -354,14 +358,17 @@ def qlesq_y_gen(root_dir):
 
     group_df = filtered_df.groupby('SUBJLABEL')
     qlesq_y = pd.DataFrame()
+    counter = {'week8':0, 'baseline':0, 'threshold':0}
     i = 0
     for subject, group in group_df:
 
 
         if "Week 8" not in group['EVENTNAME'].values:
+            counter['week8'] += 1
             continue
 
         if "Baseline" not in group['EVENTNAME'].values:
+            counter['baseline'] += 1
             continue
 
 
@@ -381,6 +388,7 @@ def qlesq_y_gen(root_dir):
         
         # Exclude patients who started with a Q-LES-Q baseline within community norm (ie. greater than 66)
         if baseline >= 67:
+            counter['threshold'] +=1
             continue
 
         assert baseline < 67, f"Patient {subject} starting with baseline Quality of Life that is already within 1SD of community norm (>= 67)"
@@ -401,6 +409,8 @@ def qlesq_y_gen(root_dir):
     # Rename columns for future script compatability
  
     print("writing qlesq_y")
+    print(counter)
+    print(len(qlesq_y.subjectkey.unique()))
     qlesq_y.to_csv(root_dir + "canbind_qlesq_y.csv", index = False)
 
     
